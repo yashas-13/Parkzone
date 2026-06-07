@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { UserProfile, Vehicle } from '../types';
+import { uploadFileToStorage } from '../firebase';
 
 interface DriverProfileProps {
   user: UserProfile;
@@ -14,6 +15,7 @@ interface DriverProfileProps {
   onBecomeHost: () => void;
   onLogout: () => void;
   onOpenDriveBackup?: () => void;
+  onUpdateAvatar?: (newUrl: string) => void;
 }
 
 export default function DriverProfile({
@@ -24,11 +26,50 @@ export default function DriverProfile({
   onBecomeHost,
   onLogout,
   onOpenDriveBackup,
+  onUpdateAvatar,
 }: DriverProfileProps) {
   const [showAddVehicleModal, setShowAddVehicleModal] = useState(false);
   const [newModel, setNewModel] = useState('');
   const [newPlate, setNewPlate] = useState('');
   const [isElectric, setIsElectric] = useState(true);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('Only images are allowed.');
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      setAvatarError('Image size must be under 3MB.');
+      return;
+    }
+
+    setAvatarUploading(true);
+    setAvatarError('');
+    try {
+      const storagePath = `avatars/${Date.now()}_${file.name}`;
+      const downloadUrl = await uploadFileToStorage(storagePath, file);
+      if (onUpdateAvatar) {
+        onUpdateAvatar(downloadUrl);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setAvatarError(err.message || 'Avatar upload failed');
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const triggerAvatarInput = () => {
+    if (avatarUploading) return;
+    avatarInputRef.current?.click();
+  };
 
   const handleAddNewVehicle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,13 +131,32 @@ export default function DriverProfile({
       <main className="pt-24 px-6 max-w-lg mx-auto relative z-10">
         {/* Profile Card details */}
         <section className="mb-8 text-center md:text-left flex flex-col md:flex-row items-center md:gap-6">
-          <div className="relative inline-block mb-3 md:mb-0">
-            <img
-              alt="Alex Harrison Portrait"
-              className="w-24 h-24 rounded-2xl border-2 border-cyan-400/20 shadow-md object-cover"
-              src={user.avatar}
-              referrerPolicy="no-referrer"
+          <div className="relative inline-block mb-3 md:mb-0 group cursor-pointer" onClick={triggerAvatarInput}>
+            <input
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarChange}
+              accept="image/*"
+              className="hidden"
             />
+            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-cyan-400/20 group-hover:border-cyan-400 transition-colors shadow-md">
+              <img
+                alt={`${user.name} Portrait`}
+                className={`w-full h-full object-cover transition-all ${avatarUploading ? 'brightness-50 blur-sm' : 'group-hover:scale-105'}`}
+                src={user.avatar}
+                referrerPolicy="no-referrer"
+              />
+              {avatarUploading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                  <div className="w-6 h-6 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : (
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity">
+                  <span className="text-[14px]">📸</span>
+                  <span className="text-[8px] font-mono font-black tracking-widest text-cyan-400 mt-0.5">UPDATE</span>
+                </div>
+              )}
+            </div>
             <div className="absolute -bottom-1 -right-1 bg-cyan-400 text-black px-2.5 py-0.5 rounded-lg text-[8px] font-mono font-black uppercase tracking-widest shadow glow-cyan">
               PRO
             </div>
@@ -106,6 +166,9 @@ export default function DriverProfile({
               {user.name}
             </h1>
             <p className="text-slate-400 text-xs font-semibold">{user.email}</p>
+            {avatarError && (
+              <p className="text-red-400 text-[10px] font-mono mt-1">⚠️ {avatarError}</p>
+            )}
             <div className="mt-3 flex flex-wrap gap-2 justify-center md:justify-start font-mono text-[9px] leading-none mb-1">
               <span className="bg-white/5 border border-white/10 text-slate-400 px-3 py-1.5 rounded-lg">
                 SINCE {user.memberSince}

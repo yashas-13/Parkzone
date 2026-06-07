@@ -6,12 +6,28 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+/**
+ * Upload a File or Blob to Firebase Storage at a given path/filename and return download URL.
+ */
+export async function uploadFileToStorage(path: string, file: File | Blob): Promise<string> {
+  try {
+    const fileRef = ref(storage, path);
+    const snapshot = await uploadBytes(fileRef, file);
+    return await getDownloadURL(snapshot.ref);
+  } catch (error: any) {
+    console.error('Firebase Storage upload failed:', error);
+    throw new Error(`Upload failed: ${error.message || error}`);
+  }
+}
 
 // Request Google Drive Scopes
 const provider = new GoogleAuthProvider();

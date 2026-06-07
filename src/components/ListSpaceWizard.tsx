@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ParkingSpot } from '../types';
+import { uploadFileToStorage } from '../firebase';
 
 interface ListSpaceWizardProps {
   onBack: () => void;
@@ -21,6 +22,10 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
   const [customName, setCustomName] = useState('');
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
   const [step, setStep] = useState(1);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const calculateWeekly = () => hourlyRate * 4 * 7; // Assuming 4 hours a day average
   const calculateMonthly = () => hourlyRate * 4 * 30;
@@ -51,6 +56,61 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
     };
 
     onPublish(generatedSpot);
+  };
+
+  const processFiles = async (files: FileList) => {
+    setUploading(true);
+    setUploadError('');
+    try {
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith('image/')) {
+          setUploadError('Only image files are allowed.');
+          continue;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          setUploadError('Image size must be less than 5MB.');
+          continue;
+        }
+        const storagePath = `parking_spots/${Date.now()}_${file.name}`;
+        const downloadUrl = await uploadFileToStorage(storagePath, file);
+        urls.push(downloadUrl);
+      }
+      if (urls.length > 0) {
+        setUploadedPhotos((prev) => [...prev, ...urls].slice(0, 3));
+      }
+    } catch (err: any) {
+      console.error(err);
+      setUploadError(err.message || 'Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      await processFiles(files);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    if (uploading) return;
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      await processFiles(files);
+    }
+  };
+
+  const triggerFileInput = () => {
+    if (uploading) return;
+    fileInputRef.current?.click();
   };
 
   const dummyUpload = () => {
@@ -352,36 +412,65 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
                 <h2 className="font-['Space_Grotesk'] text-2xl font-bold text-white mb-2 leading-tight">
                   Upload Photos
                 </h2>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">
                   Real pictures of the physical entrance reduce cancellations and increase bookings significantly.
                 </p>
+                {uploadError && (
+                  <div className="bg-red-500/10 border border-red-500/25 rounded-xl p-3 text-red-400 text-xs font-mono">
+                    ⚠️ {uploadError}
+                  </div>
+                )}
               </div>
               <div className="md:col-span-8">
                 <div className="grid grid-cols-3 gap-4">
-                  {/* Big Cover Dropzone */}
+                  {/* Big Cover Dropzone with Drag and Drop */}
                   <div
-                    onClick={dummyUpload}
-                    className="col-span-3 aspect-[21/9] bg-white/[0.01] rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center group hover:bg-cyan-400/[0.03] hover:border-cyan-400 transition-colors cursor-pointer select-none"
+                    onClick={triggerFileInput}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    className="col-span-3 aspect-[21/9] bg-white/[0.01] rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center group hover:bg-cyan-400/[0.03] hover:border-cyan-400 transition-colors cursor-pointer select-none relative overflow-hidden"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 mb-2 shadow-sm group-hover:scale-105 transition-transform text-lg">
-                      📸
-                    </div>
-                    <p className="font-bold text-sm text-white">Upload Spot Image</p>
-                    <p className="text-[9px] text-slate-500 font-mono tracking-widest uppercase font-bold mt-1">
-                      Drag and drop OR tap to upload
-                    </p>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                    />
+
+                    {uploading ? (
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-10 h-10 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+                        <p className="font-bold text-sm text-cyan-400">Uploading to Firebase Storage...</p>
+                        <p className="text-[10px] text-slate-400 font-mono mt-1">Please keep this tab open</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 mb-2 shadow-sm group-hover:scale-105 transition-transform text-lg">
+                          📸
+                        </div>
+                        <p className="font-bold text-sm text-white">Upload Spot Image</p>
+                        <p className="text-[9px] text-slate-500 font-mono tracking-widest uppercase font-bold mt-1">
+                          Drag and drop or click here to upload (max 3)
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   {uploadedPhotos.length === 0 ? (
                     <>
-                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex items-center justify-center text-slate-600 text-2xl select-none">
-                        🖼️
+                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex flex-col items-center justify-center text-slate-600 text-xs select-none gap-2">
+                        <span className="text-2xl">🖼️</span>
+                        <span>Cover Photo</span>
                       </div>
-                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex items-center justify-center text-slate-600 text-2xl select-none">
-                        🖼️
+                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex flex-col items-center justify-center text-slate-600 text-xs select-none gap-2">
+                        <span className="text-2xl">🖼️</span>
+                        <span>Angle 2</span>
                       </div>
-                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex items-center justify-center text-slate-600 text-2xl select-none">
-                        🖼️
+                      <div className="aspect-square bg-white/[0.02] rounded-xl border border-white/5 flex flex-col items-center justify-center text-slate-600 text-xs select-none gap-2">
+                        <span className="text-2xl">🖼️</span>
+                        <span>Angle 3</span>
                       </div>
                     </>
                   ) : (
@@ -396,14 +485,25 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
                       ))}
                       {uploadedPhotos.length < 3 && (
                         <div
-                          onClick={dummyUpload}
-                          className="aspect-square bg-white/5 border-2 border-dashed border-white/10 hover:border-cyan-400 hover:text-cyan-400 text-slate-400 rounded-xl flex items-center justify-center text-lg font-bold cursor-pointer transition-colors"
+                          onClick={triggerFileInput}
+                          className="aspect-square bg-white/5 border-2 border-dashed border-white/10 hover:border-cyan-400 hover:text-cyan-400 text-slate-400 rounded-xl flex flex-col items-center justify-center text-xs gap-1 cursor-pointer transition-colors"
                         >
-                          +
+                          <span className="text-xl font-bold">+</span>
+                          <span className="font-mono text-[8px] uppercase">Add Photo</span>
                         </div>
                       )}
                     </>
                   )}
+                </div>
+
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={dummyUpload}
+                    className="text-[10px] font-mono text-cyan-400/60 hover:text-cyan-400 underline cursor-pointer"
+                  >
+                    💡 No photo on hand? Populate with high-quality sample image
+                  </button>
                 </div>
               </div>
             </section>

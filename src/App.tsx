@@ -358,6 +358,21 @@ export default function App() {
     }
   };
 
+  const handleUpdateAvatar = async (newUrl: string) => {
+    const updatedUser = {
+      ...user,
+      avatar: newUrl,
+    };
+    setUser(updatedUser);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), updatedUser);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${auth.currentUser.uid}`);
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -471,6 +486,7 @@ export default function App() {
           onBecomeHost={() => setCurrentScreen('host_hub_dashboard')}
           onLogout={handleLogout}
           onOpenDriveBackup={() => setShowDriveBackup(true)}
+          onUpdateAvatar={handleUpdateAvatar}
         />
       )}
 
