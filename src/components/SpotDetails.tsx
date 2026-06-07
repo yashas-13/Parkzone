@@ -12,6 +12,41 @@ interface SpotDetailsProps {
   onReserve: (spot: ParkingSpot, totalRate: number, hours: number) => void;
   isSaved: boolean;
   onToggleSaved: (spotId: string) => void;
+  allSpots?: ParkingSpot[];
+  onSelectAlternative?: (spot: ParkingSpot) => void;
+}
+
+// Trigonometric Geodesic Distance (Haversine Formula) for precise Bangalore positioning
+function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Earth's major radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function getCompassDirection(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const y = Math.sin(dLon) * Math.cos((lat2 * Math.PI) / 180);
+  const x =
+    Math.cos((lat1 * Math.PI) / 180) * Math.sin((lat2 * Math.PI) / 180) -
+    Math.sin((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.cos(dLon);
+  let brng = (Math.atan2(y, x) * 180) / Math.PI;
+  brng = (brng + 360) % 360; // Normalize compass angle
+  if (brng >= 337.5 || brng < 22.5) return 'North';
+  if (brng >= 22.5 && brng < 67.5) return 'North-East';
+  if (brng >= 67.5 && brng < 112.5) return 'East';
+  if (brng >= 112.5 && brng < 157.5) return 'South-East';
+  if (brng >= 157.5 && brng < 202.5) return 'South';
+  if (brng >= 202.5 && brng < 247.5) return 'South-West';
+  if (brng >= 247.5 && brng < 292.5) return 'West';
+  return 'North-West';
 }
 
 export default function SpotDetails({
@@ -20,9 +55,23 @@ export default function SpotDetails({
   onReserve,
   isSaved,
   onToggleSaved,
+  allSpots = [],
+  onSelectAlternative,
 }: SpotDetailsProps) {
   const [hoursSelected, setHoursSelected] = useState(3);
   const totalCost = spot.pricePerHour * hoursSelected;
+
+  // Filter and compute alternatives nearby sorted by closest distance
+  const alternatives = allSpots
+    .filter((s) => s.id !== spot.id)
+    .map((s) => {
+      const distance = getDistanceInKm(spot.lat, spot.lng, s.lat, s.lng);
+      const direction = getCompassDirection(spot.lat, spot.lng, s.lat, s.lng);
+      const priceDiff = s.pricePerHour - spot.pricePerHour;
+      return { spot: s, distance, direction, priceDiff };
+    })
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3); // Top 3 closest alternatives
 
   return (
     <div className="bg-[#050508] text-white min-h-[100dvh] pb-32 font-sans select-none antialiased relative overflow-x-hidden">
@@ -190,6 +239,83 @@ export default function SpotDetails({
           <h3 className="font-['Space_Grotesk'] font-bold text-lg mb-2 text-white">About this location</h3>
           <p className="text-slate-400 font-medium text-xs md:text-sm">{spot.description}</p>
         </section>
+
+        {/* Alternative Parking Nearby Stream */}
+        {alternatives.length > 0 && (
+          <section className="px-5 mt-8 select-none">
+            <div className="flex justify-between items-end mb-3.5">
+              <div>
+                <span className="text-cyan-400 font-mono font-bold text-[9px] tracking-widest uppercase mb-0.5 block">
+                  COORDINATE DEVIATIONS
+                </span>
+                <h3 className="font-['Space_Grotesk'] font-bold text-lg text-white">
+                  Alternative Parking Nearby
+                </h3>
+              </div>
+              <span className="text-[10px] text-slate-500 font-mono">Top {alternatives.length} closest</span>
+            </div>
+
+            <div className="space-y-3">
+              {alternatives.map(({ spot: altSpot, distance, direction, priceDiff }) => (
+                <div
+                  key={altSpot.id}
+                  onClick={() => onSelectAlternative && onSelectAlternative(altSpot)}
+                  className="bg-[#0e0e18]/60 hover:bg-[#131326]/75 border border-white/5 hover:border-cyan-400/30 p-3.5 rounded-2xl flex items-center justify-between gap-4 cursor-pointer transition-all active:scale-98 group shadow-lg"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="w-13 h-13 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex-shrink-0 relative">
+                      <img
+                        src={altSpot.image}
+                        alt={altSpot.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform filter brightness-90"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <h4 className="font-['Space_Grotesk'] font-bold text-xs text-white truncate max-w-[140px] group-hover:text-[#22d3ee] transition-colors">
+                          {altSpot.name}
+                        </h4>
+                        <span className="px-1.5 py-0.5 bg-white/5 rounded text-[8px] font-mono text-slate-400 uppercase tracking-wider">
+                          {altSpot.type.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px]">
+                        <span className="text-cyan-400 font-mono font-bold flex items-center gap-0.5">
+                          📍 {distance.toFixed(1)} km {direction}
+                        </span>
+                        <span className="text-slate-500">•</span>
+                        <span className="text-slate-300 font-medium flex items-center gap-0.5">
+                          ⭐ {altSpot.ratings}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-end text-right select-none">
+                    <div className="font-['Space_Grotesk'] font-bold text-xs text-white">
+                      ₹{altSpot.pricePerHour}
+                      <span className="text-slate-500 font-mono font-normal text-[10px]">/hr</span>
+                    </div>
+                    {priceDiff < 0 ? (
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 mt-0.5 flex items-center gap-0.5">
+                        ₹{Math.abs(priceDiff)} cheaper
+                      </span>
+                    ) : priceDiff > 0 ? (
+                      <span className="text-[10px] font-mono font-semibold text-slate-500 mt-0.5">
+                        +₹{priceDiff}/hr
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-mono font-semibold text-cyan-400/80 mt-0.5">
+                        Same price
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Map preview block */}
         <section className="px-5 mt-6">

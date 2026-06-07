@@ -456,6 +456,8 @@ export default function App() {
           onReserve={handleReserveSpot}
           isSaved={user.savedPlaces.includes(selectedSpot.id)}
           onToggleSaved={handleToggleSavedPlace}
+          allSpots={spots}
+          onSelectAlternative={(spot) => setSelectedSpot(spot)}
         />
       )}
 
