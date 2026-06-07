@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import L from 'leaflet';
 import { ParkingSpot } from '../types';
 import { uploadFileToStorage } from '../firebase';
 
@@ -25,7 +26,143 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
 
+  const [lat, setLat] = useState(12.9716);
+  const [lng, setLng] = useState(77.6412);
+
+  const [detectingLocation, setDetectingLocation] = useState(false);
+  const [detectingError, setDetectingError] = useState('');
+
+  const detectLiveLocation = () => {
+    if (!navigator.geolocation) {
+      setDetectingError('Geolocation is not supported by your browser.');
+      return;
+    }
+    setDetectingLocation(true);
+    setDetectingError('');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const currentLat = position.coords.latitude;
+        const currentLng = position.coords.longitude;
+        setLat(currentLat);
+        setLng(currentLng);
+
+        // Update the Leaflet marker coordinates and pan the view if it is present
+        if (markerRef.current) {
+          markerRef.current.setLatLng([currentLat, currentLng]);
+        }
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.setView([currentLat, currentLng], 15);
+        }
+
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLat}&lon=${currentLng}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.display_name) {
+              setAddress(data.display_name);
+            } else {
+              setAddress(`GPS Lat: ${currentLat.toFixed(5)}, Lng: ${currentLng.toFixed(5)}`);
+            }
+          } else {
+            setAddress(`GPS Lat: ${currentLat.toFixed(5)}, Lng: ${currentLng.toFixed(5)}`);
+          }
+        } catch (e) {
+          setAddress(`GPS Lat: ${currentLat.toFixed(5)}, Lng: ${currentLng.toFixed(5)}`);
+        }
+        setDetectingLocation(false);
+      },
+      (error) => {
+        console.error('Error fetching host position:', error);
+        setDetectingError('GPS timeout or permission denied. Please click the Open Map manually.');
+        setDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  };
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
+
+  // Initialize and reload map size when opening Step 1
+  useEffect(() => {
+    if (step !== 1 || !mapRef.current) return;
+
+    // Check if map is already initialized
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.invalidateSize();
+      return;
+    }
+
+    const defaultCenter: [number, number] = [lat, lng];
+    const map = L.map(mapRef.current, {
+      center: defaultCenter,
+      zoom: 14,
+      zoomControl: true,
+      attributionControl: true,
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map);
+
+    mapInstanceRef.current = map;
+
+    // Custom Cyan Interactive Pin Circle Icon
+    const customPinHtml = `
+      <div class="relative flex items-center justify-center">
+        <div class="absolute w-8 h-8 bg-[#22d3ee] rounded-full opacity-35 animate-ping"></div>
+        <div class="w-4 h-4 bg-[#22d3ee] border-2 border-white rounded-full shadow-[0_0_12px_rgba(34,211,238,1)]"></div>
+      </div>
+    `;
+
+    const icon = L.divIcon({
+      html: customPinHtml,
+      className: 'custom-wizard-picker-marker',
+      iconSize: [24, 24],
+      iconAnchor: [12, 12]
+    });
+
+    const marker = L.marker([lat, lng], {
+      icon,
+      draggable: true
+    }).addTo(map);
+
+    markerRef.current = marker;
+
+    // Handle marker dragging updates
+    marker.on('dragend', () => {
+      const position = marker.getLatLng();
+      setLat(position.lat);
+      setLng(position.lng);
+    });
+
+    // Handle map clicks to smoothly move the selection pine
+    map.on('click', (e) => {
+      const currentLatLng = e.latlng;
+      marker.setLatLng(currentLatLng);
+      setLat(currentLatLng.lat);
+      setLng(currentLatLng.lng);
+      map.panTo(currentLatLng);
+    });
+
+    // Solve immediate render sizing glitches
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        markerRef.current = null;
+      }
+    };
+  }, [step]);
 
   const calculateWeekly = () => hourlyRate * 4 * 7; // Assuming 4 hours a day average
   const calculateMonthly = () => hourlyRate * 4 * 30;
@@ -48,8 +185,8 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
       reviews: [],
       amenities: ['CCTV 24/7', 'Self Entry'],
       description: `Premium parking slot listed by local host Alex. Spot type is classified as a ${spotType} with robust security and automated entries. Location details: ${unit || 'Main entrance'}.`,
-      lat: 12.9716,
-      lng: 77.6412,
+      lat: lat,
+      lng: lng,
       hostName: 'Alex Harrison',
       hostAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDigNdjYo25V_DYlHCMWqV3DVT4Xp-I_6-2eIqUM0WgtArxltAfg-HKfij0mzTdu0gMef36kNCuxxdce_gng2SIFTAmZovRBHgAf1nokj1kYWUz5fHQr7TSzC-Hk_dlr4Smivum36OLHRTerW-dcy2rPVliVap6DRJnSNOmm8-zp7qHc2MQd39AIcItdw2GB6bs9EewqvUKjbThIVAheJDIxrrnkZje9W_WYzbgssfMQOj0jV0LCAeH3jfC2_LaNehTMmJ3d_fMgpQ',
       status: 'active',
@@ -195,34 +332,58 @@ export default function ListSpaceWizard({ onBack, onPublish }: ListSpaceWizardPr
               </div>
               <div className="md:col-span-8 space-y-6">
                 <div className="relative">
-                  <label className="block text-[9px] font-mono font-bold uppercase tracking-widest text-cyan-400 mb-1.5 px-1">
-                    Street Address / City Area
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5 px-1 gap-2 flex-wrap">
+                    <label className="block text-[9px] font-mono font-bold uppercase tracking-widest text-cyan-400">
+                      Street Address / City Area
+                    </label>
+                    {detectingLocation ? (
+                      <span className="text-[9px] text-cyan-400 font-mono animate-pulse flex items-center gap-1 bg-cyan-950/40 border border-cyan-800/30 px-2 py-0.5 rounded">
+                        <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-ping" /> SATELLITE PINGING...
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={detectLiveLocation}
+                        className="text-[9px] text-[#22d3ee] font-mono font-bold hover:text-white cursor-pointer flex items-center gap-1 px-2 py-0.5 bg-cyan-950/40 border border-cyan-400/25 rounded hover:border-cyan-400/60 active:scale-95 transition-all select-none"
+                        title="Acquire live GPS coordinates and street details automatically"
+                      >
+                        🧭 AUTOFETCH MY LOCATION
+                      </button>
+                    )}
+                  </div>
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. 12th Main, Indiranagar, Bangalore"
-                    className="w-full bg-white/5 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 focus:outline-none rounded-xl px-4 py-3.5 text-sm font-medium text-white transition-all"
+                    className="w-full bg-white/5 border border-white/10 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 focus:outline-none rounded-xl px-4 py-3.5 text-sm font-medium text-white transition-all font-mono text-xs"
                   />
+                  {detectingError && (
+                    <p className="text-[10px] text-rose-400 font-mono mt-1 px-1 bg-rose-500/10 border border-rose-500/20 py-1 rounded">
+                      ⚠️ {detectingError}
+                    </p>
+                  )}
                 </div>
 
-                <div className="glass-panel rounded-xl overflow-hidden shadow-sm aspect-video relative group border border-white/10">
-                  <img
-                    className="w-full h-full object-cover select-none filter contrast-120 brightness-50 mix-blend-luminosity opacity-40"
-                    alt="Map illustration grid"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLBgPtUzGSylWuD_dpNbP02OYiWANm0_iOQfxiSQF6RFlZUIf8IJrD4y0eAGhS8Z63fnQblbp7d2hSazDzIasdmGGZ55Z6EnYYU1MggaTb16lbj_muekQL4Kv8raojCAQ4xjz0vD_pszJVDXVRgtGgfpzEPaRHFKqoBNT_aYyPBdc0ZEcHoa3wI8EsTMA8z4Ie5_9MkavzBe6CQXtA_G3gZmggHmwQpgqVst45rRiKeL8FGymjd8gDAJn0SK8HBMAAx5cg-gU01NM"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-12 h-12 bg-cyan-400 flex items-center justify-center rounded-full shadow-lg shadow-cyan-400/40 ring-4 ring-cyan-400/15 animate-pulse text-black text-base">
-                      📍
+                <div className="relative">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-cyan-400 mb-2 px-1">
+                    Select Exact Marker Location on Interactive Map
+                  </label>
+                  <p className="text-xs text-slate-400 mb-3 leading-relaxed">
+                    Click anywhere on the satellite tracker map below or drag the cyan beacon to specify the precise parking coordinates.
+                  </p>
+                  <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl aspect-video relative border border-white/10 h-[260px] md:h-[300px] w-full">
+                    <div ref={mapRef} className="w-full h-full z-0" />
+                    <div className="absolute top-4 left-4 z-[1000] bg-[#0a0a14]/90 backdrop-blur-md px-3 py-1.5 border border-white/10 rounded-xl shadow font-mono text-[9px] text-slate-300">
+                      🛰️ GPS lat-lng:&nbsp;
+                      <span className="text-cyan-400 font-bold">{lat.toFixed(6)}</span>,&nbsp;
+                      <span className="text-cyan-400 font-bold">{lng.toFixed(6)}</span>
                     </div>
-                  </div>
-                  <div className="absolute bottom-4 left-4 right-4 glass-panel px-4 py-3 rounded-xl border border-white/10 shadow">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-white">
-                      <span className="text-cyan-400 font-bold">📍</span>
-                      <span className="font-mono text-[11px] text-slate-200">{address}</span>
+                    <div className="absolute bottom-4 left-4 right-4 z-[1000] glass-panel px-4 py-3 rounded-xl border border-white/10 shadow bg-[#0a0a14]/90 backdrop-blur-md">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-white">
+                        <span className="text-cyan-400 font-bold animate-pulse">📍</span>
+                        <span className="font-mono text-[11px] text-slate-200 truncate">{address}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

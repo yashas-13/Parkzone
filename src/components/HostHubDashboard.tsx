@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
-import { HostProfile, ParkingSpot } from '../types';
+import React, { useState, useEffect } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase';
+import { HostProfile, ParkingSpot, Booking } from '../types';
 
 interface HostHubDashboardProps {
   hostProfile: HostProfile;
@@ -24,9 +26,46 @@ export default function HostHubDashboard({
   const [earnings, setEarnings] = useState(hostProfile.totalEarnings);
   const [tab, setTab] = useState<'overview' | 'listings' | 'earnings' | 'messages'>('overview');
 
-  const claimBonusEarnings = () => {
-    // Interactive earning update!
-    setEarnings((prev) => prev + 150);
+  // Sync earnings with real-time Firestore database updates
+  useEffect(() => {
+    setEarnings(hostProfile.totalEarnings);
+  }, [hostProfile.totalEarnings]);
+
+  const claimBonusEarnings = async () => {
+    if (auth.currentUser) {
+      const liveBookingId = `sim-booking-${Date.now()}`;
+      const plates = ['KA-01-XX-1111', 'KA-03-YY-2222', 'KA-51-ZZ-3333', 'DL-2C-AA-4444', 'MH-02-BB-5555'];
+      const randomPlate = plates[Math.floor(Math.random() * plates.length)];
+      
+      const targetSpot = hostProfile.listings[0] || {
+        id: 'system_spot_fallback',
+        name: 'Spot Indiranagar Terminal 1',
+        location: '100 Feet Rd, Indiranagar, Bangalore',
+        pricePerHour: 40
+      };
+
+      const newBooking: Booking = {
+        id: liveBookingId,
+        spotId: targetSpot.id,
+        spotName: targetSpot.name,
+        startTime: new Date().toISOString(),
+        vehiclePlate: randomPlate,
+        locationDetails: targetSpot.location,
+        pricePerHour: targetSpot.pricePerHour,
+        status: 'active',
+        userId: 'simulated_user_id',
+        hostId: auth.currentUser.uid,
+        durationHours: Math.floor(Math.random() * 4) + 1,
+      };
+
+      try {
+        await setDoc(doc(db, 'bookings', liveBookingId), newBooking);
+      } catch (err) {
+        console.error('Error committing simulated booking to db:', err);
+      }
+    } else {
+      setEarnings((prev) => prev + 150);
+    }
   };
 
   return (
@@ -243,28 +282,69 @@ export default function HostHubDashboard({
 
                 <div className="glass-panel p-5 rounded-3xl border border-white/5">
                   <h3 className="font-['Space_Grotesk'] font-bold text-lg mb-4 text-white">Live Feed</h3>
-                  <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-cyan-400 text-black rounded-lg text-[8px] font-mono font-bold uppercase tracking-widest shadow glow-cyan">
-                      <span className="w-1 h-1 bg-black rounded-full animate-pulse"></span>
-                      ACTIVE NOW
-                    </span>
-                    <span className="font-bold text-white text-xs">3 Active Parkers</span>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div className="flex items-center gap-2.5 text-xs bg-white/5 p-2 rounded-xl border border-white/5">
-                      <div className="w-7 h-7 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-[10px] font-mono">
-                        🚗
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-white leading-none text-xs font-mono">
-                          KA-01-MJ-2342
-                        </p>
-                        <p className="text-[9px] text-slate-500 font-mono truncate mt-1">
-                          Indiranagar • Ending in 42m
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  {(() => {
+                    const activeHostBookings = (hostProfile.bookings || []).filter(b => b.status === 'active');
+                    const displayCount = activeHostBookings.length > 0 ? activeHostBookings.length : 3;
+                    return (
+                      <>
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-cyan-400 text-black rounded-lg text-[8px] font-mono font-bold uppercase tracking-widest shadow glow-cyan">
+                            <span className="w-1 h-1 bg-black rounded-full animate-pulse"></span>
+                            ACTIVE NOW
+                          </span>
+                          <span className="font-bold text-white text-xs">{displayCount} Dynamic Parker{displayCount !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className="mt-4 space-y-3 max-h-[220px] overflow-y-auto scrollbar-none">
+                          {activeHostBookings.length > 0 ? (
+                            activeHostBookings.map((b) => (
+                              <div key={b.id} className="flex items-center gap-2.5 text-xs bg-white/5 p-2 rounded-xl border border-white/5">
+                                <div className="w-7 h-7 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-[10px] font-mono">
+                                  🚗
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-white leading-none text-xs font-mono">
+                                    {b.vehiclePlate}
+                                  </p>
+                                  <p className="text-[9px] text-slate-500 font-mono truncate mt-1">
+                                    {b.spotName.split(' - ')[0]} • Active ({b.durationHours || 3}h)
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2.5 text-xs bg-white/5 p-2 rounded-xl border border-white/5">
+                                <div className="w-7 h-7 rounded-lg bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-cyan-400 text-[10px] font-mono">
+                                  🚗
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-white leading-none text-xs font-mono">
+                                    KA-01-MJ-2342
+                                  </p>
+                                  <p className="text-[9px] text-slate-500 font-mono truncate mt-1">
+                                    Indiranagar • Ending in 42m
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2.5 text-xs bg-white/5 p-2 rounded-xl border border-white/5 opacity-50">
+                                <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 text-[10px] font-mono">
+                                  🚗
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-bold text-slate-400 leading-none text-xs font-mono">
+                                    KA-03-HL-9927
+                                  </p>
+                                  <p className="text-[9px] text-slate-600 font-mono truncate mt-1">
+                                    Koramangala • Simulating standby
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {onOpenDriveBackup && (

@@ -78,4 +78,5 @@ export interface HostProfile {
   percentageChange: number;
   pendingBookings: number;
   listings: ParkingSpot[];
+  bookings?: Booking[];
 }

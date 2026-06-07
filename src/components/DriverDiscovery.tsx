@@ -3,9 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ParkingSpot, UserProfile } from '../types';
-import LiveGoogleMap from './LiveGoogleMap';
 import LiveOpenStreetMap from './LiveOpenStreetMap';
 
 interface DriverDiscoveryProps {
@@ -18,13 +17,6 @@ interface DriverDiscoveryProps {
   activeSessionId: string | null;
 }
 
-const API_KEY =
-  process.env.GOOGLE_MAPS_PLATFORM_KEY ||
-  (import.meta as any).env?.VITE_GOOGLE_MAPS_PLATFORM_KEY ||
-  (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
-  '';
-const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY';
-
 export default function DriverDiscovery({
   user,
   spots,
@@ -36,11 +28,20 @@ export default function DriverDiscovery({
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'garage' | 'driveway' | 'parking_lot'>('all');
   const [spotsLeftCounter, setSpotsLeftCounter] = useState(124);
-  const [viewMode, setViewMode] = useState<'cyber' | 'osm' | 'live'>(hasValidKey ? 'live' : 'osm');
 
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const watchIdRef = useRef<number | null>(null);
+
+  // Clean up geolocation tracking on component unmount
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, []);
 
   const handleFetchLiveLocation = () => {
     if (!navigator.geolocation) {
@@ -48,10 +49,20 @@ export default function DriverDiscovery({
       return;
     }
 
+    // Toggle off if already tracking
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+      setUserCoords(null);
+      setIsLocating(false);
+      return;
+    }
+
     setIsLocating(true);
     setLocationError(null);
 
-    navigator.geolocation.getCurrentPosition(
+    // Continuous watchPosition for real-time trace updates
+    const id = navigator.geolocation.watchPosition(
       (position) => {
         setUserCoords({
           lat: position.coords.latitude,
@@ -60,10 +71,10 @@ export default function DriverDiscovery({
         setIsLocating(false);
       },
       (error) => {
-        console.error('Error fetching position:', error);
+        console.error('Error watch position:', error);
         let errorMsg = 'Unable to fetch your location.';
         if (error.code === error.PERMISSION_DENIED) {
-          errorMsg = 'Location permission denied. Please enable location access in your browser settings.';
+          errorMsg = 'Location permission denied. Please allow GPS access in your browser settings.';
         } else if (error.code === error.POSITION_UNAVAILABLE) {
           errorMsg = 'Location information is unavailable.';
         } else if (error.code === error.TIMEOUT) {
@@ -71,13 +82,19 @@ export default function DriverDiscovery({
         }
         setLocationError(errorMsg);
         setIsLocating(false);
+        if (watchIdRef.current !== null) {
+          navigator.geolocation.clearWatch(watchIdRef.current);
+          watchIdRef.current = null;
+        }
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000,
         maximumAge: 0,
       }
     );
+
+    watchIdRef.current = id;
   };
 
 
@@ -138,81 +155,7 @@ export default function DriverDiscovery({
       <main className="pt-16 pb-24 relative z-10">
         {/* Interactive map visualization section */}
         <section className="relative h-[480px] w-full overflow-hidden shadow-inner bg-[#06060c] border-b border-white/5">
-          {viewMode === 'live' ? (
-            <LiveGoogleMap spots={filteredSpots} onSelectSpot={onSelectSpot} userCoords={userCoords} />
-          ) : viewMode === 'osm' ? (
-            <LiveOpenStreetMap spots={filteredSpots} onSelectSpot={onSelectSpot} userCoords={userCoords} />
-          ) : (
-            <>
-              <div className="absolute inset-0 select-none">
-                {/* Grayscale styled minimalist Bangalore map visual - inverted and made dark for matrix cyber effect */}
-                <img
-                  className="w-full h-full object-cover opacity-20 mix-blend-screen filter invert brightness-125 contrast-125"
-                  alt="Indiranagar Koramangala local map overlay"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWU8ML5Py8Nnbdf8OlcpIREYwjzx7d4bBHarkwRDGnEY-iyKLgXTApdnbnwacZi8G41SdIsnK7L8UXKwSdB0Z8O2elHbwdjux81fyBWX_XSMYqn42LbxbPeYjPx6rHAhRPydksOBwu9ytL3axdeH-vxYxqL_2-DTSH3ywSbTl_lv_MQG0otuyzBaIFEnnXOoK9UhFkT1PTraSbSyTCFaumi85242hiDqUvhAU6v_5pEn0RJERJzqhkQAY9hi4swbEzOQi_aqD7Kks"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#050508] pointer-events-none" />
-              </div>
-
-              {/* Interactive Simulated Map Pins */}
-              {filteredSpots.map((spot, i) => {
-                const coordinates = [
-                  { top: '35%', left: '26%' },
-                  { top: '46%', left: '62%' },
-                  { top: '24%', left: '74%' },
-                  { top: '68%', left: '42%' },
-                  { top: '55%', left: '18%' },
-                ];
-                const pos = coordinates[i % coordinates.length];
-                const isSpecial = spot.id === 'metro-park-indiranagar';
-
-                return (
-                  <div
-                    key={spot.id}
-                    onClick={() => onSelectSpot(spot)}
-                    className="absolute z-10 group cursor-pointer active:scale-95 transition-transform"
-                    style={{ top: pos.top, left: pos.left }}
-                  >
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold shadow-xl flex items-center gap-0.5 transition-all border ${
-                          isSpecial
-                            ? 'bg-cyan-400 text-black border-cyan-300 glow-cyan scale-110'
-                            : 'bg-[#0a0a14] text-white border-white/10 hover:border-cyan-400 hover:text-[#22d3ee]'
-                        }`}
-                      >
-                        <span>₹{spot.pricePerHour}</span>
-                        {spot.amenities.includes('EV Charging') && (
-                          <span className="text-[10px]" title="EV Charging Station">
-                            ⚡
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className={`w-[1px] h-2 mx-auto ${
-                          isSpecial ? 'bg-cyan-400' : 'bg-white/10'
-                        }`}
-                      />
-                      {isSpecial && (
-                        <div className="bg-[#050508]/95 backdrop-blur-md border border-white/10 p-1.5 rounded-lg text-[9px] font-mono text-slate-300 whitespace-nowrap shadow mt-1">
-                          📍 Indiranagar 12th Main
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Current location blue beacon Indicator */}
-              <div className="absolute top-[52%] left-[43%] z-10 select-none">
-                <div className="w-6 h-6 bg-cyan-400 rounded-full border-2 border-slate-900 shadow-[0_0_20px_rgba(34,211,238,0.7)] flex items-center justify-center relative">
-                  <div className="absolute inset-0 bg-cyan-400 rounded-full animate-ping opacity-30"></div>
-                  <div className="w-2.5 h-2.5 bg-black rounded-full"></div>
-                </div>
-              </div>
-            </>
-          )}
+          <LiveOpenStreetMap spots={filteredSpots} onSelectSpot={onSelectSpot} userCoords={userCoords} />
 
           {/* Floated Search Overlay Box (floating on top of canvas) */}
           <div className="absolute top-6 left-0 right-0 px-6 z-20 transition-all">
@@ -281,8 +224,18 @@ export default function DriverDiscovery({
             {userCoords && (
               <div className="max-w-md mx-auto mt-2 px-3">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[9px] font-mono uppercase rounded-lg tracking-wider shadow">
-                  🛰️ GPS Active: {userCoords.lat.toFixed(4)}, {userCoords.lng.toFixed(4)}
-                  <button onClick={() => setUserCoords(null)} className="font-bold text-xs ml-1 hover:text-white cursor-pointer" title="Reset/clear live location">
+                  🛰️ Live GPS Active: {userCoords.lat.toFixed(4)}, {userCoords.lng.toFixed(4)}
+                  <button
+                    onClick={() => {
+                      if (watchIdRef.current !== null) {
+                        navigator.geolocation.clearWatch(watchIdRef.current);
+                        watchIdRef.current = null;
+                      }
+                      setUserCoords(null);
+                    }}
+                    className="font-bold text-xs ml-1 hover:text-white cursor-pointer"
+                    title="Stop real-time live location tracking"
+                  >
                     ✕
                   </button>
                 </span>
@@ -302,49 +255,22 @@ export default function DriverDiscovery({
                   ? 'border-cyan-400 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)] hover:border-cyan-300'
                   : 'border-white/10 text-slate-400 hover:text-white hover:border-white/20'
               }`}
-              title="Locate live physical GPS position"
+              title="Toggle real-time GPS tracking"
             >
               {isLocating ? (
                 <span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+              ) : userCoords ? (
+                <span className="text-base text-cyan-400 animate-pulse">🎯</span>
               ) : (
                 <span className="text-base">🎯</span>
               )}
             </button>
           </div>
 
-          {/* Map Technology Switch Pivot Overlay */}
-          <div className="absolute bottom-20 right-6 z-20 flex gap-1 p-1 bg-[#0a0a14]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl select-none">
-            <button
-              onClick={() => setViewMode('cyber')}
-              className={`px-3 py-2 rounded-xl text-[9px] font-mono font-bold tracking-wider uppercase transition-all cursor-pointer ${
-                viewMode === 'cyber'
-                  ? 'bg-white/5 text-cyan-400 border border-cyan-400/20 shadow-inner'
-                  : 'text-slate-400 hover:text-white border border-transparent'
-              }`}
-            >
-              📟 Cyber Grid
-            </button>
-            <button
-              onClick={() => setViewMode('osm')}
-              className={`px-3 py-2 rounded-xl text-[9px] font-mono font-bold tracking-wider uppercase transition-all flex items-center gap-1 cursor-pointer ${
-                viewMode === 'osm'
-                  ? 'bg-cyan-400 text-black font-extrabold shadow-[0_0_15px_rgba(34,211,238,0.35)]'
-                  : 'text-slate-400 hover:text-white border border-transparent'
-              }`}
-            >
-              🌐 Open-Source
-            </button>
-            <button
-              onClick={() => setViewMode('live')}
-              className={`px-3 py-2 rounded-xl text-[9px] font-mono font-bold tracking-wider uppercase transition-all flex items-center gap-1 cursor-pointer ${
-                viewMode === 'live'
-                  ? 'bg-cyan-400 text-black font-extrabold shadow-[0_0_15px_rgba(34,211,238,0.35)]'
-                  : 'text-slate-400 hover:text-white border border-transparent'
-              }`}
-            >
-              🗺️ Live GPS
-              {hasValidKey && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />}
-            </button>
+          {/* Map Technology Switch Indicator (Open Maps Only) */}
+          <div className="absolute bottom-20 right-6 z-20 flex px-3.5 py-2 bg-[#0a0a14]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl select-none items-center gap-1.5 text-[8.5px] font-mono uppercase tracking-widest text-[#22d3ee]">
+            <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
+            🌐 OpenStreetMap Active
           </div>
         </section>
 
