@@ -4,9 +4,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { HostProfile, ParkingSpot, Booking } from '../types';
+import AdBanner from './AdBanner';
+
 
 interface HostHubDashboardProps {
   hostProfile: HostProfile;
@@ -25,6 +28,18 @@ export default function HostHubDashboard({
 }: HostHubDashboardProps) {
   const [earnings, setEarnings] = useState(hostProfile.totalEarnings);
   const [tab, setTab] = useState<'overview' | 'listings' | 'earnings' | 'messages'>('overview');
+
+  const [localNotification, setLocalNotification] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  const triggerNotification = (message: string, type: 'success' | 'info' | 'error' = 'info') => {
+    setLocalNotification({ message, type });
+  };
+
+  useEffect(() => {
+    if (!localNotification) return;
+    const t = setTimeout(() => setLocalNotification(null), 3500);
+    return () => clearTimeout(t);
+  }, [localNotification]);
 
   // Sync earnings with real-time Firestore database updates
   useEffect(() => {
@@ -175,7 +190,7 @@ export default function HostHubDashboard({
                   <p className="text-slate-400 font-mono text-[9px] uppercase tracking-wider mt-1">Actions required today</p>
                 </div>
                 <button
-                  onClick={() => alert('All reviews completed! No further pending details.')}
+                  onClick={() => triggerNotification('All reviews completed! No further pending details.', 'success')}
                   className="mt-4 flex items-center gap-1.5 text-cyan-400 font-mono font-bold text-[9px] uppercase tracking-wide hover:text-cyan-300 transition-colors cursor-pointer"
                 >
                   Review Spaces List →
@@ -262,6 +277,10 @@ export default function HostHubDashboard({
 
               {/* Insights Column */}
               <div className="lg:col-span-2 space-y-6">
+                <div className="w-full flex justify-center mb-6">
+                  <AdBanner size="mediumRectangle" />
+                </div>
+                
                 <div className="bg-[#0a0a14] border border-white/10 text-white p-5 rounded-3xl flex flex-col justify-between shadow-xl">
                   <h3 className="font-['Space_Grotesk'] font-bold text-lg mb-3 text-white">Quick Insights</h3>
                   <div className="space-y-3 font-semibold text-xs leading-normal">
@@ -399,7 +418,7 @@ export default function HostHubDashboard({
             <h2 className="text-xl font-bold font-['Space_Grotesk'] text-white mb-2">Simulated Balance</h2>
             <p className="text-xs text-slate-400 mb-4 font-sans max-w-xs mx-auto">Earnings accrued are automatically credited to your associated debit bank account weekly.</p>
             <div className="text-4xl font-extrabold text-cyan-400 font-['Space_Grotesk'] drop-shadow-[0_0_10px_rgba(34,211,238,0.25)] mb-6">₹{earnings.toLocaleString()}</div>
-            <button onClick={() => alert('Simulated withdrawal success!')} className="px-6 py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-mono font-bold uppercase tracking-widest text-xs rounded-xl glow-cyan cursor-pointer">Simulate Withdraw</button>
+            <button onClick={() => triggerNotification('Simulated withdrawal sequence initiated successfully!', 'success')} className="px-6 py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-mono font-bold uppercase tracking-widest text-xs rounded-xl glow-cyan cursor-pointer">Simulate Withdraw</button>
           </div>
         )}
 
@@ -454,6 +473,43 @@ export default function HostHubDashboard({
           <span className="text-[9px] uppercase tracking-wide font-mono font-extrabold mt-0.5">Messages</span>
         </button>
       </nav>
+
+      {/* Premium Local Animated Feedback Notification banner */}
+      <AnimatePresence>
+        {localNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            className="fixed bottom-24 left-0 right-0 z-[9999] px-6 pointer-events-none"
+          >
+            <div
+              className={`max-w-md mx-auto p-4 rounded-2xl backdrop-blur-xl border flex items-center justify-between shadow-2xl pointer-events-auto relative overflow-hidden ${
+                localNotification.type === 'success'
+                  ? 'bg-[#061814]/95 border-emerald-500/35 text-emerald-300 shadow-emerald-950/20'
+                  : 'bg-[#070914]/95 border-cyan-500/35 text-cyan-300 shadow-cyan-950/20'
+              }`}
+            >
+              <div className={`absolute inset-0 opacity-[0.04] pointer-events-none ${
+                localNotification.type === 'success' ? 'bg-emerald-400' : 'bg-cyan-400'
+              }`} />
+              <div className="flex items-center gap-2.5 select-none relative z-10 w-full pr-1">
+                <span className="text-sm">
+                  {localNotification.type === 'success' ? '✨' : '🛸'}
+                </span>
+                <p className="text-[11px] font-sans font-semibold leading-snug">{localNotification.message}</p>
+              </div>
+              <button
+                onClick={() => setLocalNotification(null)}
+                className="text-white/40 hover:text-white font-bold text-xs p-1 cursor-pointer transition-colors relative z-10"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

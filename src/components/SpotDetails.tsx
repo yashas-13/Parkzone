@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ParkingSpot } from '../types';
+import AdBanner from './AdBanner';
 
 interface SpotDetailsProps {
   spot: ParkingSpot;
@@ -59,6 +61,18 @@ export default function SpotDetails({
   onSelectAlternative,
 }: SpotDetailsProps) {
   const [hoursSelected, setHoursSelected] = useState(3);
+  const [localNotification, setLocalNotification] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
+  const triggerNotification = (message: string, type: 'success' | 'info' = 'info') => {
+    setLocalNotification({ message, type });
+  };
+
+  useEffect(() => {
+    if (!localNotification) return;
+    const t = setTimeout(() => setLocalNotification(null), 3500);
+    return () => clearTimeout(t);
+  }, [localNotification]);
+
   const totalCost = spot.pricePerHour * hoursSelected;
 
   // Filter and compute alternatives nearby sorted by closest distance
@@ -111,7 +125,7 @@ export default function SpotDetails({
                 if (navigator.share) {
                   navigator.share({ title: spot.name, text: spot.location, url: window.location.href });
                 } else {
-                  alert('Copied location to clipboard: ' + spot.location);
+                  triggerNotification('Copied location of spot to clipboard!', 'success');
                 }
               }}
               className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-cyan-400 text-slate-400 hover:text-cyan-400 cursor-pointer"
@@ -175,7 +189,7 @@ export default function SpotDetails({
 
           <button
             onClick={() =>
-              alert(`Navigating to ${spot.name}. Coordinates: ${spot.lat}, ${spot.lng}`)
+              triggerNotification(`Launching turn-by-turn navigation route to ${spot.name}!`, 'info')
             }
             className="col-span-2 bg-cyan-400 hover:bg-cyan-300 text-black p-3.5 rounded-xl flex items-center justify-center gap-2 font-mono font-bold uppercase tracking-widest text-xs shadow glow-cyan active:scale-98 transition-all cursor-pointer"
           >
@@ -232,6 +246,11 @@ export default function SpotDetails({
               );
             })}
           </div>
+        </section>
+
+        {/* AdMob Integration Banner */}
+        <section className="px-5 mt-6 w-full flex justify-center">
+          <AdBanner size="banner" />
         </section>
 
         {/* About location block */}
@@ -396,6 +415,43 @@ export default function SpotDetails({
           Reserve Spot Now
         </button>
       </footer>
+
+      {/* Premium Local Animated Feedback Notification banner */}
+      <AnimatePresence>
+        {localNotification && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: 30 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            className="fixed bottom-24 left-0 right-0 z-50 px-6 pointer-events-none"
+          >
+            <div
+              className={`max-w-md mx-auto p-4 rounded-2xl backdrop-blur-xl border flex items-center justify-between shadow-2xl pointer-events-auto relative overflow-hidden ${
+                localNotification.type === 'success'
+                  ? 'bg-[#061814]/95 border-emerald-500/35 text-emerald-300 shadow-emerald-950/20'
+                  : 'bg-[#070914]/95 border-cyan-500/35 text-cyan-300 shadow-cyan-950/20'
+              }`}
+            >
+              <div className={`absolute inset-0 opacity-[0.04] pointer-events-none ${
+                localNotification.type === 'success' ? 'bg-emerald-400' : 'bg-cyan-400'
+              }`} />
+              <div className="flex items-center gap-2.5 select-none relative z-10 w-full pr-1">
+                <span className="text-sm">
+                  {localNotification.type === 'success' ? '✨' : '🛸'}
+                </span>
+                <p className="text-[11px] font-sans font-semibold leading-snug">{localNotification.message}</p>
+              </div>
+              <button
+                onClick={() => setLocalNotification(null)}
+                className="text-white/40 hover:text-white font-bold text-xs p-1 cursor-pointer transition-colors relative z-10"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ParkingSpot, UserProfile, HostProfile, Booking, Vehicle } from './types';
 import {
   INITIAL_PARKING_SPOTS,
@@ -62,6 +63,19 @@ export default function App() {
   const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null);
   const [showDriveBackup, setShowDriveBackup] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'info') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => {
+      setToast(null);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   // Firestore metadata for hosts
   const [hostMeta, setHostMeta] = useState({
@@ -376,8 +390,9 @@ export default function App() {
     if (activeBooking) {
       try {
         await updateDoc(doc(db, 'bookings', activeBooking.id), { status: 'completed' });
-        alert(
-          `Successfully completed active parking reservation pass at ${activeBooking.spotName}! Thank you for choosing Parkzone services.`
+        showToast(
+          `Completed active parking session at ${activeBooking.spotName}! Thank you for choosing Parkit services.`,
+          'success'
         );
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `bookings/${activeBooking.id}`);
@@ -435,113 +450,197 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050508]">
-      {currentScreen === 'splash' && (
-        <Splash
-          onFindParking={() => setCurrentScreen('driver_discovery')}
-          onLogin={() => setCurrentScreen('onboarding')}
-          onCreateAccount={() => setCurrentScreen('onboarding')}
-          onGoogleSignIn={googleSignIn}
-          onExplore={() => setCurrentScreen('driver_discovery')}
-          onBeHost={() => setCurrentScreen('host_welcome')}
-        />
-      )}
+    <div className="min-h-screen bg-[#050508] relative overflow-x-hidden">
+      <AnimatePresence mode="wait">
+        {currentScreen === 'splash' && (
+          <motion.div
+            key="splash"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <Splash
+              onFindParking={() => setCurrentScreen('driver_discovery')}
+              onLogin={() => setCurrentScreen('onboarding')}
+              onCreateAccount={() => setCurrentScreen('onboarding')}
+              onGoogleSignIn={googleSignIn}
+              onExplore={() => setCurrentScreen('driver_discovery')}
+              onBeHost={() => setCurrentScreen('host_welcome')}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'onboarding' && (
-        <Onboarding
-          onBack={() => setCurrentScreen('splash')}
-          onSubmit={handleCreateProfileOnboarding}
-        />
-      )}
+        {currentScreen === 'onboarding' && (
+          <motion.div
+            key="onboarding"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <Onboarding
+              onBack={() => setCurrentScreen('splash')}
+              onSubmit={handleCreateProfileOnboarding}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'host_welcome' && (
-        <HostWelcome
-          onBack={() => setCurrentScreen('splash')}
-          onListSpace={() => setCurrentScreen('list_space_wizard')}
-          onMaybeLater={() => setCurrentScreen('driver_discovery')}
-        />
-      )}
+        {currentScreen === 'host_welcome' && (
+          <motion.div
+            key="host_welcome"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <HostWelcome
+              onBack={() => setCurrentScreen('splash')}
+              onListSpace={() => setCurrentScreen('list_space_wizard')}
+              onMaybeLater={() => setCurrentScreen('driver_discovery')}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'list_space_wizard' && (
-        <ListSpaceWizard
-          onBack={() => setCurrentScreen('host_welcome')}
-          onPublish={handlePublishNewSpace}
-        />
-      )}
+        {currentScreen === 'list_space_wizard' && (
+          <motion.div
+            key="list_space_wizard"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <ListSpaceWizard
+              onBack={() => setCurrentScreen('host_welcome')}
+              onPublish={handlePublishNewSpace}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'driver_discovery' && (
-        <DriverDiscovery
-          user={user}
-          spots={spots}
-          onSelectSpot={(spot) => {
-            setSelectedSpot(spot);
-            setCurrentScreen('spot_details');
-          }}
-          onOpenProfile={() => setCurrentScreen('driver_profile')}
-          onOpenBookings={() => {
-            if (activeBooking) {
-              setCurrentScreen('active_session_pass');
-            } else {
-              alert(
-                'You do not have any active booking sessions at the moment! Search near Indiranagar below to book one.'
-              );
-            }
-          }}
-          activeSessionId={activeBooking ? activeBooking.id : null}
-        />
-      )}
+        {currentScreen === 'driver_discovery' && (
+          <motion.div
+            key="driver_discovery"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <DriverDiscovery
+              user={user}
+              spots={spots}
+              onSelectSpot={(spot) => {
+                setSelectedSpot(spot);
+                setCurrentScreen('spot_details');
+              }}
+              onOpenProfile={() => setCurrentScreen('driver_profile')}
+              onOpenBookings={() => {
+                if (activeBooking) {
+                  setCurrentScreen('active_session_pass');
+                } else {
+                  showToast(
+                    'No active reservation found! Please select a spot on the map to begin.',
+                    'info'
+                  );
+                }
+              }}
+              activeSessionId={activeBooking ? activeBooking.id : null}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'spot_details' && selectedSpot && (
-        <SpotDetails
-          spot={selectedSpot}
-          onBack={() => setCurrentScreen('driver_discovery')}
-          onReserve={handleReserveSpot}
-          isSaved={user.savedPlaces.includes(selectedSpot.id)}
-          onToggleSaved={handleToggleSavedPlace}
-          allSpots={spots}
-          onSelectAlternative={(spot) => setSelectedSpot(spot)}
-        />
-      )}
+        {currentScreen === 'spot_details' && selectedSpot && (
+          <motion.div
+            key="spot_details"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <SpotDetails
+              spot={selectedSpot}
+              onBack={() => setCurrentScreen('driver_discovery')}
+              onReserve={handleReserveSpot}
+              isSaved={user.savedPlaces.includes(selectedSpot.id)}
+              onToggleSaved={handleToggleSavedPlace}
+              allSpots={spots}
+              onSelectAlternative={(spot) => setSelectedSpot(spot)}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'active_session_pass' && activeBooking && (
-        <ActiveSessionPass
-          user={user}
-          booking={activeBooking}
-          onEndSession={handleEndBookingSession}
-          onOpenFind={() => setCurrentScreen('driver_discovery')}
-          onOpenProfile={() => setCurrentScreen('driver_profile')}
-        />
-      )}
+        {currentScreen === 'active_session_pass' && activeBooking && (
+          <motion.div
+            key="active_session_pass"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <ActiveSessionPass
+              user={user}
+              booking={activeBooking}
+              onEndSession={handleEndBookingSession}
+              onOpenFind={() => setCurrentScreen('driver_discovery')}
+              onOpenProfile={() => setCurrentScreen('driver_profile')}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'host_hub_dashboard' && (
-        <HostHubDashboard
-          hostProfile={hostProfile}
-          onListNewSpace={() => setCurrentScreen('list_space_wizard')}
-          onToggleListingStatus={handleToggleListingStatus}
-          onBackToDriver={() => setCurrentScreen('driver_discovery')}
-          onOpenDriveBackup={() => setShowDriveBackup(true)}
-        />
-      )}
+        {currentScreen === 'host_hub_dashboard' && (
+          <motion.div
+            key="host_hub_dashboard"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <HostHubDashboard
+              hostProfile={hostProfile}
+              onListNewSpace={() => setCurrentScreen('list_space_wizard')}
+              onToggleListingStatus={handleToggleListingStatus}
+              onBackToDriver={() => setCurrentScreen('driver_discovery')}
+              onOpenDriveBackup={() => setShowDriveBackup(true)}
+            />
+          </motion.div>
+        )}
 
-      {currentScreen === 'driver_profile' && (
-        <DriverProfile
-          user={user}
-          onAddVehicle={handleAddVehicle}
-          onBackToFind={() => setCurrentScreen('driver_discovery')}
-          onBackToBookings={() => {
-            if (activeBooking) {
-              setCurrentScreen('active_session_pass');
-            } else {
-              alert('You do not have any active booking sessions. Find a parking spot near Indiranagar first!');
-              setCurrentScreen('driver_discovery');
-            }
-          }}
-          onBecomeHost={() => setCurrentScreen('host_hub_dashboard')}
-          onLogout={handleLogout}
-          onOpenDriveBackup={() => setShowDriveBackup(true)}
-          onUpdateAvatar={handleUpdateAvatar}
-        />
-      )}
+        {currentScreen === 'driver_profile' && (
+          <motion.div
+            key="driver_profile"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            className="w-full"
+          >
+            <DriverProfile
+              user={user}
+              onAddVehicle={handleAddVehicle}
+              onBackToFind={() => setCurrentScreen('driver_discovery')}
+              onBackToBookings={() => {
+                if (activeBooking) {
+                  setCurrentScreen('active_session_pass');
+                } else {
+                  showToast('No active passes found. Reserve a spot from the map screen!', 'info');
+                  setCurrentScreen('driver_discovery');
+                }
+              }}
+              onBecomeHost={() => setCurrentScreen('host_hub_dashboard')}
+              onLogout={handleLogout}
+              onOpenDriveBackup={() => setShowDriveBackup(true)}
+              onUpdateAvatar={handleUpdateAvatar}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {showDriveBackup && (
         <DriveBackupCenter
@@ -552,6 +651,46 @@ export default function App() {
           onClose={() => setShowDriveBackup(false)}
         />
       )}
+
+      {/* Dynamic Premium Animated Custom Toast Overlay */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 28 }}
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] w-[90%] max-w-sm pointer-events-auto"
+          >
+            <div
+              className={`p-4 rounded-2xl backdrop-blur-xl border flex items-center justify-between shadow-2xl relative overflow-hidden ${
+                toast.type === 'success'
+                  ? 'bg-[#061814]/95 border-emerald-500/35 text-emerald-300 shadow-emerald-950/20'
+                  : toast.type === 'error'
+                  ? 'bg-[#1a0808]/95 border-rose-500/35 text-rose-300 shadow-rose-950/20'
+                  : 'bg-[#070914]/95 border-cyan-500/35 text-cyan-300 shadow-cyan-950/20'
+              }`}
+            >
+              {/* Soft color glow backing */}
+              <div className={`absolute inset-0 opacity-[0.04] pointer-events-none ${
+                toast.type === 'success' ? 'bg-emerald-400' : toast.type === 'error' ? 'bg-rose-400' : 'bg-cyan-400'
+              }`} />
+              <div className="flex items-center gap-3 pr-2 select-none relative z-10 w-full">
+                <span className="text-sm flex-shrink-0">
+                  {toast.type === 'success' ? '✨' : toast.type === 'error' ? '⚠️' : 'ℹ️'}
+                </span>
+                <p className="text-[11px] font-sans font-medium line-clamp-2 leading-snug">{toast.message}</p>
+              </div>
+              <button
+                onClick={() => setToast(null)}
+                className="text-white/40 hover:text-white font-bold text-xs p-1 cursor-pointer transition-colors relative z-10"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
