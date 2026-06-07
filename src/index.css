@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --font-headline: "Space Grotesk", sans-serif;
+  --color-brand-cyan: #22d3ee;
+  --color-brand-blue: #005dff;
+}
+
+/* Custom general resets */
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #050508;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+}
+
+/* Immersive Theme Styles */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px rgba(0, 93, 255, 0.4);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-heavy {
+  background: rgba(10, 10, 18, 0.75);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.aura-bg {
+  background: radial-gradient(circle at 50% -20%, #111827 0%, transparent 60%), radial-gradient(circle at 0% 100%, #083344 0%, transparent 40%);
+}
+
+.orb {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, #22d3ee 0%, transparent 70%);
+  opacity: 0.12;
+  filter: blur(60px);
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom scrollbars utilities for horizontal sliders */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
