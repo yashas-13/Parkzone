@@ -13,7 +13,7 @@ interface AdBannerProps {
 }
 
 export default function AdBanner({ 
-  unitId = import.meta.env.VITE_ADMOB_BANNER_UNIT_ID, 
+  unitId = import.meta.env.VITE_ADMOB_BANNER_UNIT_ID || 'ca-app-pub-4519705537022498/7843392658', 
   size = 'banner', 
   className = '' 
 }: AdBannerProps) {
