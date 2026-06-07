@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile containing vehicles list, payment methods and saved parking spots",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "avatar": { "type": "string" },
+        "verified": { "type": "boolean" },
+        "memberSince": { "type": "string" },
+        "vehicles": { "type": "array" },
+        "paymentMethods": { "type": "array" },
+        "savedPlaces": { "type": "array" }
+      },
+      "required": ["name", "email", "verified"]
+    },
+    "ParkingSpot": {
+      "title": "ParkingSpot",
+      "description": "Information about a specific parking space listed on Parkit",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "pricePerHour": { "type": "number" },
+        "spotsLeft": { "type": "number" },
+        "totalSpots": { "type": "number" },
+        "type": { "type": "string", "enum": ["garage", "driveway", "parking_lot"] },
+        "image": { "type": "string" },
+        "ratings": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "reviews": { "type": "array" },
+        "amenities": { "type": "array" },
+        "description": { "type": "string" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "hostName": { "type": "string" },
+        "hostAvatar": { "type": "string" },
+        "status": { "type": "string" },
+        "hostId": { "type": "string" }
+      },
+      "required": ["id", "name", "location", "pricePerHour", "hostId"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Parking spot booking reservation log",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "spotId": { "type": "string" },
+        "spotName": { "type": "string" },
+        "startTime": { "type": "string" },
+        "vehiclePlate": { "type": "string" },
+        "locationDetails": { "type": "string" },
+        "pricePerHour": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "completed", "pending"] },
+        "userId": { "type": "string" },
+        "hostId": { "type": "string" }
+      },
+      "required": ["id", "spotId", "vehiclePlate", "status", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User specific personal files, custom vehicles and billing accounts"
+    },
+    "/parkingSpots/{spotId}": {
+      "schema": "ParkingSpot",
+      "description": "Available parking space listings, searchable by drivers and updatable by hosts"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "User booking transactions and active parking states"
+    }
+  }
+}

@@ -19,6 +19,30 @@ import SpotDetails from './components/SpotDetails';
 import ActiveSessionPass from './components/ActiveSessionPass';
 import HostHubDashboard from './components/HostHubDashboard';
 import DriverProfile from './components/DriverProfile';
+import DriveBackupCenter from './components/DriveBackupCenter';
+
+// Firebase imports
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  writeBatch,
+  getDocFromServer
+} from 'firebase/firestore';
+import { User } from 'firebase/auth';
+import {
+  db,
+  auth,
+  initAuth,
+  googleSignIn,
+  handleFirestoreError,
+  OperationType
+} from './firebase';
 
 type ScreenType =
   | 'splash'
@@ -35,25 +59,173 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('splash');
   const [spots, setSpots] = useState<ParkingSpot[]>(INITIAL_PARKING_SPOTS);
   const [user, setUser] = useState<UserProfile>(INITIAL_USER_PROFILE);
-  const [hostProfile, setHostProfile] = useState<HostProfile>(INITIAL_HOST_PROFILE);
   const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
   const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null);
+  const [showDriveBackup, setShowDriveBackup] = useState(false);
 
-  // Synchronize dynamic listing state changes inside Host & Driver spot registries
+  // Firestore metadata for hosts
+  const [hostMeta, setHostMeta] = useState({
+    totalEarnings: 42850,
+    percentageChange: 12,
+    pendingBookings: 8,
+  });
+
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+
+  // Computed Host Profile
+  const hostProfile: HostProfile = {
+    ...hostMeta,
+    listings: spots.filter((s) => s.hostId === (auth.currentUser?.uid || 'system_host')),
+  };
+
+  // Google authentication session setup & dynamic profile syncing
   useEffect(() => {
-    // Add default host listings inside general spots list on startup if not already there
-    const combined = [...spots];
-    hostProfile.listings.forEach((hostSpot) => {
-      if (!combined.some((s) => s.id === hostSpot.id)) {
-        combined.push(hostSpot);
+    async function testConnection() {
+      try {
+        await getDocFromServer(doc(db, 'test', 'connection'));
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('the client is offline')) {
+          console.warn("Please check your Firebase configuration.");
+        }
       }
-    });
-    if (combined.length !== spots.length) {
-      setSpots(combined);
     }
-  }, [hostProfile.listings]);
+    testConnection();
 
-  const handleCreateProfileOnboarding = (data: { name: string; phone: string; plate: string }) => {
+    const unsubscribe = initAuth(
+      async (currentUser) => {
+        setFirebaseUser(currentUser);
+        // Load user profile from Firebase
+        const userRef = doc(db, 'users', currentUser.uid);
+        try {
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            setUser(userSnap.data() as UserProfile);
+          } else {
+            // Seed a new Firestore profile from Google Account info and standard presets
+            const newProfile: UserProfile = {
+              name: currentUser.displayName || 'Alex Harrison',
+              email: currentUser.email || 'alex@urbanmail.com',
+              avatar: currentUser.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+              verified: true,
+              memberSince: new Date().getFullYear().toString(),
+              vehicles: [
+                { id: 'v1', model: 'Tesla Model 3', plate: 'KA-01-MG-1234', isElectric: true }
+              ],
+              paymentMethods: [
+                { id: 'p1', type: 'card', label: '•••• 8829', isDefault: true, expiry: '09/26' },
+                { id: 'p2', type: 'apple_pay', label: 'Apple Pay', isDefault: false }
+              ],
+              savedPlaces: ['metro-park-indiranagar']
+            };
+            await setDoc(userRef, newProfile);
+            setUser(newProfile);
+          }
+        } catch (err) {
+          handleFirestoreError(err, OperationType.GET, `users/${currentUser.uid}`);
+        }
+      },
+      () => {
+        setFirebaseUser(null);
+      }
+    );
+    return () => unsubscribe();
+  }, []);
+
+  // Real-time synchronization of parking spots
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'parkingSpots'),
+      async (snapshot) => {
+        if (snapshot.empty) {
+          // Seed Firestore with original sample spots if database is fresh
+          try {
+            const batch = writeBatch(db);
+            INITIAL_PARKING_SPOTS.forEach((spot) => {
+              const spotRef = doc(db, 'parkingSpots', spot.id);
+              batch.set(spotRef, { ...spot, hostId: 'system_host' });
+            });
+            await batch.commit();
+          } catch (seedErr) {
+            console.error('Error seeding parking spots list:', seedErr);
+          }
+        } else {
+          const parsedSpots: ParkingSpot[] = [];
+          snapshot.forEach((doc) => {
+            parsedSpots.push(doc.data() as ParkingSpot);
+          });
+          setSpots(parsedSpots);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.LIST, 'parkingSpots');
+      }
+    );
+    return () => unsub();
+  }, []);
+
+  // Real-time synchronization of active booking reservations
+  useEffect(() => {
+    if (!firebaseUser) {
+      setActiveBooking(null);
+      return;
+    }
+    const q = query(
+      collection(db, 'bookings'),
+      where('userId', '==', firebaseUser.uid),
+      where('status', '==', 'active')
+    );
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        if (!snapshot.empty) {
+          setActiveBooking(snapshot.docs[0].data() as Booking);
+        } else {
+          setActiveBooking(null);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.LIST, 'bookings');
+      }
+    );
+    return () => unsub();
+  }, [firebaseUser]);
+
+  // Handle direct file imports & recovery operations from Google Drive
+  const handleRestoreUser = async (restored: UserProfile) => {
+    setUser(restored);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), restored);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${auth.currentUser.uid}`);
+      }
+    }
+  };
+
+  const handleRestoreHost = async (restoredHost: HostProfile) => {
+    setHostMeta({
+      totalEarnings: restoredHost.totalEarnings,
+      percentageChange: restoredHost.percentageChange,
+      pendingBookings: restoredHost.pendingBookings,
+    });
+    if (auth.currentUser) {
+      try {
+        const batch = writeBatch(db);
+        restoredHost.listings.forEach((spot) => {
+          const spotRef = doc(db, 'parkingSpots', spot.id);
+          batch.set(spotRef, {
+            ...spot,
+            hostId: auth.currentUser?.uid || 'system_host',
+          });
+        });
+        await batch.commit();
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, 'batch/parkingSpots');
+      }
+    }
+  };
+
+  const handleCreateProfileOnboarding = async (data: { name: string; phone: string; plate: string }) => {
     const updatedUser: UserProfile = {
       ...user,
       name: data.name,
@@ -68,53 +240,65 @@ export default function App() {
         ...user.vehicles,
       ],
     };
+
     setUser(updatedUser);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), updatedUser);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${auth.currentUser.uid}`);
+      }
+    }
     setCurrentScreen('driver_discovery');
   };
 
-  const handleAddVehicle = (newVehicle: Vehicle) => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      vehicles: [...prevUser.vehicles, newVehicle],
-    }));
+  const handleAddVehicle = async (newVehicle: Vehicle) => {
+    const updatedUser = {
+      ...user,
+      vehicles: [...user.vehicles, newVehicle],
+    };
+    setUser(updatedUser);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), updatedUser);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${auth.currentUser.uid}`);
+      }
+    }
   };
 
-  const handlePublishNewSpace = (newSpot: ParkingSpot) => {
-    // 1. Add to host listings
-    setHostProfile((prev) => ({
-      ...prev,
-      listings: [newSpot, ...prev.listings],
-    }));
-    // 2. Add to active parking spots map
-    setSpots((prevSpots) => [newSpot, ...prevSpots]);
-    // 3. Return to Host dashboard overview
-    setCurrentScreen('host_hub_dashboard');
+  const handlePublishNewSpace = async (newSpot: ParkingSpot) => {
+    const spotWithHost: ParkingSpot = {
+      ...newSpot,
+      hostId: auth.currentUser?.uid || 'system_host',
+      hostName: auth.currentUser?.displayName || newSpot.hostName,
+      hostAvatar: auth.currentUser?.photoURL || newSpot.hostAvatar,
+    };
+
+    try {
+      await setDoc(doc(db, 'parkingSpots', newSpot.id), spotWithHost);
+      setCurrentScreen('host_hub_dashboard');
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `parkingSpots/${newSpot.id}`);
+    }
   };
 
-  const handleToggleListingStatus = (spotId: string) => {
-    setHostProfile((prev) => ({
-      ...prev,
-      listings: prev.listings.map((spot) =>
-        spot.id === spotId
-          ? { ...spot, status: spot.status === 'active' ? 'inactive' : 'active' }
-          : spot
-      ),
-    }));
-
-    setSpots((prev) =>
-      prev.map((spot) =>
-        spot.id === spotId
-          ? { ...spot, status: spot.status === 'active' ? 'inactive' : 'active' }
-          : spot
-      )
-    );
+  const handleToggleListingStatus = async (spotId: string) => {
+    const curSpot = spots.find((s) => s.id === spotId);
+    if (!curSpot) return;
+    const nextStatus = curSpot.status === 'active' ? 'inactive' : 'active';
+    try {
+      await updateDoc(doc(db, 'parkingSpots', spotId), { status: nextStatus });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, `parkingSpots/${spotId}`);
+    }
   };
 
-  const handleReserveSpot = (spot: ParkingSpot, totalRate: number) => {
-    // Active primary plate fallback for entry pass
+  const handleReserveSpot = async (spot: ParkingSpot, totalRate: number) => {
     const hostPlate = user.vehicles[0]?.plate || 'KA-01-MG-1234';
+    const bookingId = `booking-${Date.now()}`;
     const newBooking: Booking = {
-      id: `booking-${Date.now()}`,
+      id: bookingId,
       spotId: spot.id,
       spotName: spot.name,
       startTime: new Date().toISOString(),
@@ -122,34 +306,64 @@ export default function App() {
       locationDetails: spot.location,
       pricePerHour: spot.pricePerHour,
       status: 'active',
+      userId: auth.currentUser?.uid || 'guest_user',
+      hostId: spot.hostId || 'system_host',
     };
 
-    setActiveBooking(newBooking);
-    setCurrentScreen('active_session_pass');
+    try {
+      await setDoc(doc(db, 'bookings', bookingId), newBooking);
+      await updateDoc(doc(db, 'parkingSpots', spot.id), {
+        spotsLeft: Math.max(0, spot.spotsLeft - 1),
+      });
+      setActiveBooking(newBooking);
+      setCurrentScreen('active_session_pass');
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `bookings/${bookingId}`);
+    }
   };
 
-  const handleEndBookingSession = () => {
+  const handleEndBookingSession = async () => {
     if (activeBooking) {
-      alert(`Successfully completed active parking reservation pass at ${activeBooking.spotName}! Thank you for choosing Parkit services.`);
+      try {
+        await updateDoc(doc(db, 'bookings', activeBooking.id), { status: 'completed' });
+        alert(
+          `Successfully completed active parking reservation pass at ${activeBooking.spotName}! Thank you for choosing Parkit services.`
+        );
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `bookings/${activeBooking.id}`);
+      }
     }
     setActiveBooking(null);
     setCurrentScreen('driver_discovery');
   };
 
-  const handleToggleSavedPlace = (spotId: string) => {
-    setUser((prevUser) => {
-      const isSaved = prevUser.savedPlaces.includes(spotId);
-      const updated = isSaved
-        ? prevUser.savedPlaces.filter((id) => id !== spotId)
-        : [...prevUser.savedPlaces, spotId];
-      return {
-        ...prevUser,
-        savedPlaces: updated,
-      };
-    });
+  const handleToggleSavedPlace = async (spotId: string) => {
+    const isSaved = user.savedPlaces.includes(spotId);
+    const updatedPlaces = isSaved
+      ? user.savedPlaces.filter((id) => id !== spotId)
+      : [...user.savedPlaces, spotId];
+
+    const updatedUser = {
+      ...user,
+      savedPlaces: updatedPlaces,
+    };
+
+    setUser(updatedUser);
+    if (auth.currentUser) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), updatedUser);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, `users/${auth.currentUser.uid}`);
+      }
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     setUser(INITIAL_USER_PROFILE);
     setActiveBooking(null);
     setCurrentScreen('splash');
@@ -202,7 +416,9 @@ export default function App() {
             if (activeBooking) {
               setCurrentScreen('active_session_pass');
             } else {
-              alert('You do not have any active booking sessions at the moment! Search near Indiranagar below to book one.');
+              alert(
+                'You do not have any active booking sessions at the moment! Search near Indiranagar below to book one.'
+              );
             }
           }}
           activeSessionId={activeBooking ? activeBooking.id : null}
@@ -235,6 +451,7 @@ export default function App() {
           onListNewSpace={() => setCurrentScreen('list_space_wizard')}
           onToggleListingStatus={handleToggleListingStatus}
           onBackToDriver={() => setCurrentScreen('driver_discovery')}
+          onOpenDriveBackup={() => setShowDriveBackup(true)}
         />
       )}
 
@@ -253,6 +470,17 @@ export default function App() {
           }}
           onBecomeHost={() => setCurrentScreen('host_hub_dashboard')}
           onLogout={handleLogout}
+          onOpenDriveBackup={() => setShowDriveBackup(true)}
+        />
+      )}
+
+      {showDriveBackup && (
+        <DriveBackupCenter
+          userProfile={user}
+          hostProfile={hostProfile}
+          onRestoreUser={handleRestoreUser}
+          onRestoreHost={handleRestoreHost}
+          onClose={() => setShowDriveBackup(false)}
         />
       )}
     </div>

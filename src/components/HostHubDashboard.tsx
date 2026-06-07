@@ -11,6 +11,7 @@ interface HostHubDashboardProps {
   onListNewSpace: () => void;
   onToggleListingStatus: (spotId: string) => void;
   onBackToDriver: () => void;
+  onOpenDriveBackup?: () => void;
 }
 
 export default function HostHubDashboard({
@@ -18,6 +19,7 @@ export default function HostHubDashboard({
   onListNewSpace,
   onToggleListingStatus,
   onBackToDriver,
+  onOpenDriveBackup,
 }: HostHubDashboardProps) {
   const [earnings, setEarnings] = useState(hostProfile.totalEarnings);
   const [tab, setTab] = useState<'overview' | 'listings' | 'earnings' | 'messages'>('overview');
@@ -51,6 +53,14 @@ export default function HostHubDashboard({
             </span>
           </div>
           <div className="flex items-center gap-4">
+            {onOpenDriveBackup && (
+              <button
+                onClick={onOpenDriveBackup}
+                className="text-cyan-400 hover:text-cyan-300 font-mono font-bold text-[9px] uppercase tracking-widest bg-cyan-400/10 hover:bg-cyan-400/20 border border-cyan-400/30 px-3.5 py-2.5 rounded-xl transition-all cursor-pointer shadow-sm"
+              >
+                ☁ Sync Drive
+              </button>
+            )}
             <button
               onClick={onBackToDriver}
               className="text-black font-mono font-bold text-[9px] uppercase tracking-widest bg-cyan-400 hover:bg-cyan-300 px-3.5 py-2.5 rounded-xl transition-colors cursor-pointer glow-cyan"
@@ -256,6 +266,22 @@ export default function HostHubDashboard({
                     </div>
                   </div>
                 </div>
+
+                {onOpenDriveBackup && (
+                  <div className="glass-panel p-5 rounded-3xl border border-white/5 bg-gradient-to-br from-cyan-400/5 to-transparent relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <h3 className="font-['Space_Grotesk'] font-bold text-sm text-white mb-1">Google Drive Sync</h3>
+                    <p className="text-[10px] text-slate-400 font-sans leading-normal mb-3.5">
+                      Backup and secure your custom host space listings, pricing logs, and calculated metrics safely onto Google Drive.
+                    </p>
+                    <button
+                      onClick={onOpenDriveBackup}
+                      className="w-full py-2.5 bg-cyan-400 hover:bg-cyan-300 text-black font-mono font-bold uppercase tracking-widest text-[9px] rounded-xl transition-all shadow glow-cyan text-center cursor-pointer"
+                    >
+                      ☁ Configure Drive Backups
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

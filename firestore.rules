@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net denier
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Shared helper checks
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // ---- USER PROFILE COLLECTION ----
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false;
+      
+      function isValidUser(data) {
+        return data.name is string && data.name.size() <= 100
+            && data.email is string && data.email.size() <= 100
+            && data.verified is bool;
+      }
+    }
+
+    // ---- PARKING SPOTS COLLECTION ----
+    match /parkingSpots/{spotId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isOwner(request.resource.data.hostId) && isValidSpot(request.resource.data);
+      allow update: if isSignedIn() && (
+        isOwner(resource.data.hostId) && isValidSpot(request.resource.data)
+      );
+      allow delete: if isSignedIn() && isOwner(resource.data.hostId);
+
+      function isValidSpot(data) {
+        return data.id is string && data.id.size() <= 128
+            && data.name is string && data.name.size() <= 150
+            && data.location is string && data.location.size() <= 200
+            && data.pricePerHour is number && data.pricePerHour >= 0
+            && data.hostId is string && data.hostId.size() <= 128;
+      }
+    }
+
+    // ---- BOOKINGS COLLECTION ----
+    match /bookings/{bookingId} {
+      allow read: if isSignedIn() && (
+        isOwner(resource.data.userId) || isOwner(resource.data.hostId)
+      );
+      allow create: if isSignedIn() && isOwner(request.resource.data.userId) && isValidBooking(request.resource.data);
+      allow update: if isSignedIn() && (
+        isOwner(resource.data.userId) && isValidBooking(request.resource.data)
+      );
+      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+
+      function isValidBooking(data) {
+        return data.id is string && data.id.size() <= 128
+            && data.spotId is string && data.spotId.size() <= 128
+            && data.userId is string && data.userId.size() <= 128
+            && data.status is string && (data.status == 'active' || data.status == 'completed' || data.status == 'pending');
+      }
+    }
+  }
+}

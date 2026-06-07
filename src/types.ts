@@ -30,6 +30,7 @@ export interface ParkingSpot {
   hostName: string;
   hostAvatar: string;
   status: 'active' | 'inactive' | 'filling_fast' | 'available' | 'cheap';
+  hostId?: string;
 }
 
 export interface Vehicle {
@@ -48,6 +49,8 @@ export interface Booking {
   locationDetails: string;
   pricePerHour: number;
   status: 'active' | 'completed' | 'pending';
+  userId?: string;
+  hostId?: string;
 }
 
 export interface PaymentMethod {
