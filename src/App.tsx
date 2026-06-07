@@ -137,6 +137,8 @@ export default function App() {
       collection(db, 'parkingSpots'),
       async (snapshot) => {
         if (snapshot.empty) {
+          // Set initial fallback spots in case we are seeding or seeding fails
+          setSpots(INITIAL_PARKING_SPOTS);
           // Seed Firestore with original sample spots if database is fresh
           try {
             const batch = writeBatch(db);
@@ -157,6 +159,8 @@ export default function App() {
         }
       },
       (error) => {
+        console.warn('Firestore subscription failed, falling back to local spots:', error);
+        setSpots(INITIAL_PARKING_SPOTS);
         handleFirestoreError(error, OperationType.LIST, 'parkingSpots');
       }
     );
@@ -294,7 +298,7 @@ export default function App() {
     }
   };
 
-  const handleReserveSpot = async (spot: ParkingSpot, totalRate: number) => {
+  const handleReserveSpot = async (spot: ParkingSpot, totalRate: number, durationHours: number = 3) => {
     const hostPlate = user.vehicles[0]?.plate || 'KA-01-MG-1234';
     const bookingId = `booking-${Date.now()}`;
     const newBooking: Booking = {
@@ -308,6 +312,7 @@ export default function App() {
       status: 'active',
       userId: auth.currentUser?.uid || 'guest_user',
       hostId: spot.hostId || 'system_host',
+      durationHours: durationHours,
     };
 
     try {

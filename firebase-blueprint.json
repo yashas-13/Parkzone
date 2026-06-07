@@ -57,7 +57,8 @@
         "pricePerHour": { "type": "number" },
         "status": { "type": "string", "enum": ["active", "completed", "pending"] },
         "userId": { "type": "string" },
-        "hostId": { "type": "string" }
+        "hostId": { "type": "string" },
+        "durationHours": { "type": "number" }
       },
       "required": ["id", "spotId", "vehiclePlate", "status", "userId"]
     }

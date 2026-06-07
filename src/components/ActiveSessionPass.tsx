@@ -22,6 +22,11 @@ export default function ActiveSessionPass({
   onOpenProfile,
 }: ActiveSessionPassProps) {
   const [seconds, setSeconds] = useState(0);
+  const [permissionStatus, setPermissionStatus] = useState<NotificationPermission>(
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
+  );
+  const [hasNotified, setHasNotified] = useState(false);
+  const [testCountdown, setTestCountdown] = useState<number | null>(null);
 
   // Initialize of the counter based on estimated start time
   useEffect(() => {
@@ -31,6 +36,84 @@ export default function ActiveSessionPass({
     return () => clearInterval(interval);
   }, []);
 
+  // Request notifications permission with initial feedback
+  const handleRequestPermission = async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      alert('This browser does not support desktop notifications.');
+      return;
+    }
+    try {
+      const permission = await Notification.requestPermission();
+      setPermissionStatus(permission);
+      if (permission === 'granted') {
+        new Notification('Parkit Notifications Enabled!', {
+          body: 'We will alert you when your parking session is about to expire.',
+          icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
+        });
+      }
+    } catch (e) {
+      console.error('Error requesting notification permission:', e);
+    }
+  };
+
+  // Simulate an expiry alert immediately
+  const handleSimulateExpiry = () => {
+    if (permissionStatus !== 'granted') {
+      handleRequestPermission();
+      return;
+    }
+    setTestCountdown(3);
+  };
+
+  // Test countdown hook
+  useEffect(() => {
+    if (testCountdown === null) return;
+
+    if (testCountdown === 0) {
+      setTestCountdown(null);
+      try {
+        new Notification('Parkit: Parking Pass Expiring Soon!', {
+          body: `SIMULATION: Your reserved parking pass at ${booking.spotName} has less than 5 minutes left!`,
+          icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
+          tag: 'parkit-expiry-sim',
+          requireInteraction: true,
+        });
+      } catch (err) {
+        console.error('Error triggering test notification:', err);
+      }
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setTestCountdown(testCountdown - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [testCountdown, booking]);
+
+  // Real-time notification check: about to expire (5 minutes / 300 seconds left)
+  useEffect(() => {
+    if (permissionStatus !== 'granted' || hasNotified) return;
+
+    const totalDurationSecs = (booking.durationHours || 3) * 3600;
+    const currentElapsedSecs = seconds + 5055;
+    const remainingSecs = totalDurationSecs - currentElapsedSecs;
+
+    if (remainingSecs > 0 && remainingSecs <= 300) {
+      setHasNotified(true);
+      try {
+        new Notification('Parkit: Space Session Expiring Soon!', {
+          body: `Your session at ${booking.spotName} has less than 5 minutes remaining. Please extend or prepare to vacate.`,
+          icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
+          tag: 'parkit-expiry',
+          requireInteraction: true,
+        });
+      } catch (err) {
+        console.error('Error triggering notification:', err);
+      }
+    }
+  }, [seconds, permissionStatus, hasNotified, booking]);
+
   const formatTime = (totalSec: number) => {
     // Add default mock hour to match aesthetic layout
     const baseSeconds = totalSec + 5055; // Sets up 01:24:15 starting range visual!
@@ -38,6 +121,22 @@ export default function ActiveSessionPass({
     const mins = Math.floor((baseSeconds % 3600) / 60);
     const secs = baseSeconds % 60;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const formatRemainingTime = () => {
+    const totalDurationSecs = (booking.durationHours || 3) * 3600;
+    const currentElapsedSecs = seconds + 5055;
+    const remainingSecs = totalDurationSecs - currentElapsedSecs;
+    if (remainingSecs <= 0) {
+      return 'Expired';
+    }
+    const hrs = Math.floor(remainingSecs / 3600);
+    const mins = Math.floor((remainingSecs % 3600) / 60);
+    const secs = remainingSecs % 60;
+    if (hrs > 0) {
+      return `${hrs}h ${mins}m ${secs}s`;
+    }
+    return `${mins}m ${secs}s`;
   };
 
   const calculateAccruedCost = () => {
@@ -113,6 +212,47 @@ export default function ActiveSessionPass({
               {formatTime(seconds)}
             </p>
           </div>
+        </div>
+
+        {/* Smart Expiry Alerts Control Panel */}
+        <div className="glass-panel rounded-2xl p-4.5 border border-white/5 mb-5 select-none text-left">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">🔔</span>
+              <div>
+                <h4 className="font-['Space_Grotesk'] font-bold text-sm text-white">Smart Expiry Alerts</h4>
+                <p className="text-[10px] text-slate-400 font-medium font-sans">Notify 5 mins before session ends</p>
+              </div>
+            </div>
+            <button
+              onClick={handleRequestPermission}
+              className={`px-3 py-1.5 rounded-xl text-[9px] font-mono font-bold tracking-wider uppercase transition-all cursor-pointer ${
+                permissionStatus === 'granted'
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  : permissionStatus === 'denied'
+                  ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                  : 'bg-cyan-400 text-black hover:bg-cyan-300 font-extrabold glow-cyan'
+              }`}
+            >
+              {permissionStatus === 'granted' ? 'Enabled ✓' : permissionStatus === 'denied' ? 'Blocked ⚠' : 'Enable'}
+            </button>
+          </div>
+          
+          {permissionStatus === 'granted' && (
+            <div className="pt-2.5 border-t border-white/5 flex items-center justify-between gap-3">
+              <div className="text-[10px] text-slate-400 font-sans leading-tight">
+                <span className="block mb-1">Session limit: <strong>{booking.durationHours || 3} Hours</strong></span>
+                <span>Time Remaining: <strong className="text-cyan-400 font-mono tracking-wide">{formatRemainingTime()}</strong></span>
+              </div>
+              <button
+                onClick={handleSimulateExpiry}
+                disabled={testCountdown !== null}
+                className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-cyan-400 border border-cyan-400/20 hover:border-cyan-400/50 rounded-lg text-[9px] font-mono font-bold uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {testCountdown !== null ? `Alerting in ${testCountdown}s...` : '⚡ Test Alert'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Vehicle & Parking details block */}

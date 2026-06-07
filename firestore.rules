@@ -20,6 +20,11 @@ service cloud.firestore {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    // Allow connection test
+    match /test/connection {
+      allow read: if true;
+    }
+
     // ---- USER PROFILE COLLECTION ----
     match /users/{userId} {
       allow read: if isSignedIn();
@@ -35,32 +40,34 @@ service cloud.firestore {
 
     // ---- PARKING SPOTS COLLECTION ----
     match /parkingSpots/{spotId} {
-      allow read: if true;
-      allow create: if isSignedIn() && isOwner(request.resource.data.hostId) && isValidSpot(request.resource.data);
-      allow update: if isSignedIn() && (
-        isOwner(resource.data.hostId) && isValidSpot(request.resource.data)
-      );
+      allow get, list: if true;
+      allow create: if (request.resource.data.hostId == 'system_host' && isValidSpot(request.resource.data))
+                    || (isSignedIn() && isOwner(request.resource.data.hostId) && isValidSpot(request.resource.data));
+      allow update: if (request.resource.data.hostId == 'system_host' && isValidSpot(request.resource.data))
+                    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['spotsLeft']))
+                    || (isSignedIn() && isOwner(resource.data.hostId) && isValidSpot(request.resource.data));
       allow delete: if isSignedIn() && isOwner(resource.data.hostId);
 
       function isValidSpot(data) {
         return data.id is string && data.id.size() <= 128
             && data.name is string && data.name.size() <= 150
             && data.location is string && data.location.size() <= 200
-            && data.pricePerHour is number && data.pricePerHour >= 0
             && data.hostId is string && data.hostId.size() <= 128;
       }
     }
 
     // ---- BOOKINGS COLLECTION ----
     match /bookings/{bookingId} {
-      allow read: if isSignedIn() && (
+      allow read: if (resource.data.userId == 'guest_user') || (isSignedIn() && (
         isOwner(resource.data.userId) || isOwner(resource.data.hostId)
-      );
-      allow create: if isSignedIn() && isOwner(request.resource.data.userId) && isValidBooking(request.resource.data);
-      allow update: if isSignedIn() && (
-        isOwner(resource.data.userId) && isValidBooking(request.resource.data)
-      );
-      allow delete: if isSignedIn() && isOwner(resource.data.userId);
+      ));
+      allow create: if (request.resource.data.userId == 'guest_user' && isValidBooking(request.resource.data))
+                    || (isSignedIn() && isOwner(request.resource.data.userId) && isValidBooking(request.resource.data));
+      allow update: if (resource.data.userId == 'guest_user' && isValidBooking(request.resource.data))
+                    || (isSignedIn() && (
+                      isOwner(resource.data.userId) && isValidBooking(request.resource.data)
+                    ));
+      allow delete: if (resource.data.userId == 'guest_user') || (isSignedIn() && isOwner(resource.data.userId));
 
       function isValidBooking(data) {
         return data.id is string && data.id.size() <= 128

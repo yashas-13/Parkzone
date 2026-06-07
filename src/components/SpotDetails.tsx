@@ -9,7 +9,7 @@ import { ParkingSpot } from '../types';
 interface SpotDetailsProps {
   spot: ParkingSpot;
   onBack: () => void;
-  onReserve: (spot: ParkingSpot, totalRate: number) => void;
+  onReserve: (spot: ParkingSpot, totalRate: number, hours: number) => void;
   isSaved: boolean;
   onToggleSaved: (spotId: string) => void;
 }
@@ -263,7 +263,7 @@ export default function SpotDetails({
           </span>
         </div>
         <button
-          onClick={() => onReserve(spot, totalCost)}
+          onClick={() => onReserve(spot, totalCost, hoursSelected)}
           id="btn-reserve-spot"
           className="flex-1 max-w-[240px] bg-cyan-400 hover:bg-cyan-300 text-black py-4 rounded-xl font-mono uppercase tracking-widest font-bold text-xs shadow glow-cyan active:scale-95 transition-all text-center cursor-pointer"
         >

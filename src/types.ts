@@ -51,6 +51,7 @@ export interface Booking {
   status: 'active' | 'completed' | 'pending';
   userId?: string;
   hostId?: string;
+  durationHours?: number;
 }
 
 export interface PaymentMethod {
