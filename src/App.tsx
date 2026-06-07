@@ -100,6 +100,7 @@ export default function App() {
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setUser(userSnap.data() as UserProfile);
+            setCurrentScreen((prev) => (prev === 'splash' || prev === 'onboarding' ? 'driver_discovery' : prev));
           } else {
             // Seed a new Firestore profile from Google Account info and standard presets
             const newProfile: UserProfile = {
@@ -119,6 +120,7 @@ export default function App() {
             };
             await setDoc(userRef, newProfile);
             setUser(newProfile);
+            setCurrentScreen((prev) => (prev === 'splash' || prev === 'onboarding' ? 'driver_discovery' : prev));
           }
         } catch (err) {
           handleFirestoreError(err, OperationType.GET, `users/${currentUser.uid}`);
@@ -233,7 +235,8 @@ export default function App() {
     const updatedUser: UserProfile = {
       ...user,
       name: data.name,
-      email: `${data.name.toLowerCase().replace(/\s+/g, '.')}@urbanmail.com`,
+      email: auth.currentUser?.email || `${data.name.toLowerCase().replace(/\s+/g, '.')}@urbanmail.com`,
+      avatar: auth.currentUser?.photoURL || user.avatar,
       vehicles: [
         {
           id: `v-${Date.now()}`,
@@ -332,7 +335,7 @@ export default function App() {
       try {
         await updateDoc(doc(db, 'bookings', activeBooking.id), { status: 'completed' });
         alert(
-          `Successfully completed active parking reservation pass at ${activeBooking.spotName}! Thank you for choosing Parkit services.`
+          `Successfully completed active parking reservation pass at ${activeBooking.spotName}! Thank you for choosing Parkzone services.`
         );
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `bookings/${activeBooking.id}`);
@@ -396,6 +399,7 @@ export default function App() {
           onFindParking={() => setCurrentScreen('driver_discovery')}
           onLogin={() => setCurrentScreen('onboarding')}
           onCreateAccount={() => setCurrentScreen('onboarding')}
+          onGoogleSignIn={googleSignIn}
           onExplore={() => setCurrentScreen('driver_discovery')}
           onBeHost={() => setCurrentScreen('host_welcome')}
         />

@@ -46,7 +46,7 @@ export default function ActiveSessionPass({
       const permission = await Notification.requestPermission();
       setPermissionStatus(permission);
       if (permission === 'granted') {
-        new Notification('Parkit Notifications Enabled!', {
+        new Notification('Parkzone Notifications Enabled!', {
           body: 'We will alert you when your parking session is about to expire.',
           icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
         });
@@ -72,10 +72,10 @@ export default function ActiveSessionPass({
     if (testCountdown === 0) {
       setTestCountdown(null);
       try {
-        new Notification('Parkit: Parking Pass Expiring Soon!', {
+        new Notification('Parkzone: Parking Pass Expiring Soon!', {
           body: `SIMULATION: Your reserved parking pass at ${booking.spotName} has less than 5 minutes left!`,
           icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
-          tag: 'parkit-expiry-sim',
+          tag: 'parkzone-expiry-sim',
           requireInteraction: true,
         });
       } catch (err) {
@@ -102,10 +102,10 @@ export default function ActiveSessionPass({
     if (remainingSecs > 0 && remainingSecs <= 300) {
       setHasNotified(true);
       try {
-        new Notification('Parkit: Space Session Expiring Soon!', {
+        new Notification('Parkzone: Space Session Expiring Soon!', {
           body: `Your session at ${booking.spotName} has less than 5 minutes remaining. Please extend or prepare to vacate.`,
           icon: 'https://lh3.googleusercontent.com/aida-public/AB6AXu27H7m62UOre5aTgD7GHP_WvEilak6Q1F7zy9Wsk_CxZ53MEDCsuYiluDRnWnucq376t_Lx9ac-HcROob5HwqBBCJhabJpYda8mu3MPEH1PBnMXqGbUscPFk1kVwnRrURrSY73Z7Ph08xR-F3qv8xaq9UDB5eC0fjws-RbcTwxXF9sUrIEDHK6_jPlOUPZXbzCloS-9AiC3vXoVjjVkCTGFA9eGRpU7vnqjbC3gLxiw5jUEiqEwDeqPsQxWIwdVlI6bGrNh6MgHFc',
-          tag: 'parkit-expiry',
+          tag: 'parkzone-expiry',
           requireInteraction: true,
         });
       } catch (err) {

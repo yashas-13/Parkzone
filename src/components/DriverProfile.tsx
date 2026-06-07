@@ -319,7 +319,7 @@ export default function DriverProfile({
               className="p-4 flex items-center gap-3.5 bg-rose-500/10 hover:bg-rose-500/15 transition-colors cursor-pointer text-xs font-bold text-rose-400"
             >
               <span>🚪</span>
-              <div className="flex-grow">Sign Out of Parkit</div>
+              <div className="flex-grow">Sign Out of Parkzone</div>
             </div>
           </div>
         </section>

@@ -156,8 +156,8 @@ export async function listDriveFiles(): Promise<DriveFile[]> {
   const token = await getAccessToken();
   if (!token) throw new Error('Not authenticated. Please connect Google Drive first.');
 
-  // Search only for JSON backup files created by Parkit to enforce clean least-privilege view
-  const q = encodeURIComponent("name contains 'parkit_backup' and trashed = false");
+  // Search only for JSON backup files created by Parkzone/Parkit to enforce clean least-privilege view
+  const q = encodeURIComponent("(name contains 'parkzone_backup' or name contains 'parkit_backup') and trashed = false");
   const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,mimeType,createdTime,size,webViewLink)&orderBy=createdTime desc`;
 
   const res = await fetch(url, {

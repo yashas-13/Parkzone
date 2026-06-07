@@ -18,7 +18,7 @@
     },
     "ParkingSpot": {
       "title": "ParkingSpot",
-      "description": "Information about a specific parking space listed on Parkit",
+      "description": "Information about a specific parking space listed on Parkzone",
       "type": "object",
       "properties": {
         "id": { "type": "string" },

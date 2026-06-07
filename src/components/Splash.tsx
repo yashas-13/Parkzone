@@ -10,6 +10,7 @@ interface SplashProps {
   onFindParking: () => void;
   onLogin: () => void;
   onCreateAccount: () => void;
+  onGoogleSignIn: () => void;
   onExplore: () => void;
   onBeHost: () => void;
 }
@@ -18,6 +19,7 @@ export default function Splash({
   onFindParking,
   onLogin,
   onCreateAccount,
+  onGoogleSignIn,
   onExplore,
   onBeHost,
 }: SplashProps) {
@@ -44,7 +46,7 @@ export default function Splash({
         <div className="flex items-center gap-2 mb-3">
           <div className="w-10 h-[1.5px] bg-[#22d3ee] rounded-full glow-cyan"></div>
           <span className="text-cyan-400 font-mono text-[9px] tracking-[0.3em] uppercase font-bold">
-            PARKIT SYSTEM INTERFACE
+            PARKZONE SYSTEM INTERFACE
           </span>
           <div className="w-10 h-[1.5px] bg-[#22d3ee] rounded-full glow-cyan"></div>
         </div>
@@ -53,7 +55,7 @@ export default function Splash({
             <div className="w-3 h-3 bg-black rounded-sm rotate-45"></div>
           </div>
           <h1 className="font-['Space_Grotesk'] font-bold text-6xl tracking-tighter text-white drop-shadow-[0_0_20px_rgba(34,211,238,0.5)]">
-            Parkit
+            Parkzone
           </h1>
         </div>
       </div>
@@ -95,7 +97,7 @@ export default function Splash({
       </div>
 
       {/* Bottom Action Area */}
-      <div className="relative z-10 w-full max-w-md px-6 pb-12 flex flex-col gap-5">
+      <div className="relative z-10 w-full max-w-md px-6 pb-12 flex flex-col gap-4">
         <button
           onClick={onFindParking}
           id="btn-find-parking-near-me"
@@ -117,7 +119,15 @@ export default function Splash({
           </svg>
         </button>
 
-        <div className="flex items-center justify-between px-2 text-slate-400 font-medium text-xs font-mono select-none">
+        <button
+          onClick={onGoogleSignIn}
+          className="w-full h-13 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/30 rounded-2xl flex items-center justify-center gap-2.5 active:scale-95 transition-all font-mono font-bold text-xs tracking-wider uppercase text-white cursor-pointer"
+        >
+          <span>🔑</span>
+          <span>Continue with Google</span>
+        </button>
+
+        <div className="flex items-center justify-between px-2 text-slate-500 font-medium text-[10px] font-mono select-none mt-1">
           <button
             onClick={onLogin}
             className="uppercase tracking-widest hover:text-cyan-400 transition-colors cursor-pointer"

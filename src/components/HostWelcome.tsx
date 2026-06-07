@@ -46,7 +46,7 @@ export default function HostWelcome({ onBack, onListSpace, onMaybeLater }: HostW
               <div className="w-1.5 h-1.5 bg-black rounded-sm rotate-45"></div>
             </div>
             <span className="font-['Space_Grotesk'] font-bold text-lg tracking-tight text-white">
-              Parkit <span className="text-cyan-400">Host</span>
+              Parkzone <span className="text-cyan-400">Host</span>
             </span>
           </div>
         </div>

@@ -131,11 +131,11 @@ export default function DriveBackupCenter({
     setLoading(true);
     try {
       const payload = {
-        appIdentifier: 'parkit_driver_state',
+        appIdentifier: 'parkzone_driver_state',
         backupTime: new Date().toISOString(),
         profile: userProfile,
       };
-      await backupDataToDrive('parkit_backup_driver.json', payload);
+      await backupDataToDrive('parkzone_backup_driver.json', payload);
       showNotification('success', 'Driver settings and fleet successfully backed up to Google Drive!');
       await fetchFiles();
     } catch (error: any) {
@@ -150,11 +150,11 @@ export default function DriveBackupCenter({
     setLoading(true);
     try {
       const payload = {
-        appIdentifier: 'parkit_host_state',
+        appIdentifier: 'parkzone_host_state',
         backupTime: new Date().toISOString(),
         profile: hostProfile,
       };
-      await backupDataToDrive('parkit_backup_host.json', payload);
+      await backupDataToDrive('parkzone_backup_host.json', payload);
       showNotification('success', 'Host spaces registry successfully backed up to Google Drive!');
       await fetchFiles();
     } catch (error: any) {
@@ -176,14 +176,14 @@ export default function DriveBackupCenter({
     setLoading(true);
     try {
       const restoredPayload = await downloadDataFromDrive(file.id);
-      if (restoredPayload.appIdentifier === 'parkit_driver_state') {
+      if (restoredPayload.appIdentifier === 'parkzone_driver_state' || restoredPayload.appIdentifier === 'parkit_driver_state') {
         onRestoreUser(restoredPayload.profile);
         showNotification('success', 'Driver active fleet & saved spaces restored successfully!');
-      } else if (restoredPayload.appIdentifier === 'parkit_host_state') {
+      } else if (restoredPayload.appIdentifier === 'parkzone_host_state' || restoredPayload.appIdentifier === 'parkit_host_state') {
         onRestoreHost(restoredPayload.profile);
         showNotification('success', 'Host listings and metrics restored successfully!');
       } else {
-        throw new Error('Unrecognized Parkit backup format.');
+        throw new Error('Unrecognized Parkzone backup format.');
       }
     } catch (error: any) {
       showNotification('error', `Restore error: ${error.message || error}`);
@@ -365,7 +365,7 @@ export default function DriveBackupCenter({
 
               {backups.length === 0 ? (
                 <div className="text-center py-8 bg-white/[0.01] border border-dashed border-white/10 rounded-2xl">
-                  <p className="text-xs text-slate-500 font-medium font-sans">No Parkit backup files found in this Drive folder.</p>
+                  <p className="text-xs text-slate-500 font-medium font-sans">No Parkzone backup files found in this Drive folder.</p>
                   <p className="text-[10px] text-slate-600 font-sans mt-0.5">Click any button above to create one now.</p>
                 </div>
               ) : (

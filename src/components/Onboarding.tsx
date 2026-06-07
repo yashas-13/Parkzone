@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
+import { auth, googleSignIn } from '../firebase';
 
 interface OnboardingProps {
   onBack: () => void;
@@ -12,10 +13,46 @@ interface OnboardingProps {
 }
 
 export default function Onboarding({ onBack, onSubmit }: OnboardingProps) {
-  const [name, setName] = useState('');
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [googleProfile, setGoogleProfile] = useState<{
+    displayName: string | null;
+    email: string | null;
+    photoURL: string | null;
+  } | null>(
+    auth.currentUser
+      ? {
+          displayName: auth.currentUser.displayName,
+          email: auth.currentUser.email,
+          photoURL: auth.currentUser.photoURL,
+        }
+      : null
+  );
+
+  const [name, setName] = useState(auth.currentUser?.displayName || '');
   const [phone, setPhone] = useState('');
   const [plate, setPlate] = useState('');
   const [error, setError] = useState('');
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    setError('');
+    try {
+      const result = await googleSignIn();
+      if (result) {
+        setGoogleProfile({
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+        });
+        setName(result.user.displayName || '');
+      }
+    } catch (err: any) {
+      console.error('Google Sign In Error on Onboarding:', err);
+      setError(err.message || 'Failed to authenticate with Google.');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +102,7 @@ export default function Onboarding({ onBack, onSubmit }: OnboardingProps) {
             <div className="w-6 h-6 bg-cyan-400 rounded-full flex items-center justify-center glow-cyan">
               <div className="w-2 h-2 bg-black rounded-sm rotate-45"></div>
             </div>
-            <h1 className="font-['Space_Grotesk'] font-bold text-3xl text-white">Parkit</h1>
+            <h1 className="font-['Space_Grotesk'] font-bold text-3xl text-white">Parkzone</h1>
           </div>
         </div>
 
@@ -96,7 +133,7 @@ export default function Onboarding({ onBack, onSubmit }: OnboardingProps) {
             <div className="w-4 h-4 bg-cyan-400 rounded-full flex items-center justify-center glow-cyan">
               <div className="w-1.5 h-1.5 bg-black rounded-sm rotate-45"></div>
             </div>
-            <h2 className="font-['Space_Grotesk'] font-bold text-xl text-white">Parkit</h2>
+            <h2 className="font-['Space_Grotesk'] font-bold text-xl text-white">Parkzone</h2>
           </div>
           <div className="text-[9px] font-mono font-bold text-slate-500 tracking-widest uppercase">
             Step 3 of 3
@@ -127,6 +164,59 @@ export default function Onboarding({ onBack, onSubmit }: OnboardingProps) {
             {error && (
               <div className="p-3 bg-red-950/45 text-red-300 text-xs rounded-xl border border-red-500/30">
                 ⚠️ {error}
+              </div>
+            )}
+
+            {/* Google Authentication Section */}
+            {googleProfile ? (
+              <div className="p-4 rounded-2xl border border-emerald-500/10 bg-emerald-500/5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {googleProfile.photoURL ? (
+                    <img
+                      src={googleProfile.photoURL}
+                      alt={googleProfile.displayName || 'Google Profile'}
+                      className="w-10 h-10 rounded-full border border-emerald-500/20"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold border border-emerald-500/20">
+                      G
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-[9px] font-mono font-bold text-emerald-400 tracking-wider">
+                      GOOGLE ACCOUNT CONNECTED ✓
+                    </div>
+                    <div className="text-sm font-bold text-white leading-tight mt-0.5">{googleProfile.displayName}</div>
+                    <div className="text-[10px] text-slate-400 font-mono">{googleProfile.email}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGoogleProfile(null);
+                  }}
+                  className="text-[10px] uppercase font-mono font-bold text-slate-500 hover:text-rose-400 px-2 py-1 transition-colors cursor-pointer"
+                >
+                  Disconnect
+                </button>
+              </div>
+            ) : (
+              <div className="p-4.5 rounded-2xl glass-panel border border-white/5 bg-gradient-to-br from-cyan-400/5 to-transparent text-left">
+                <h3 className="font-['Space_Grotesk'] font-bold text-xs text-white mb-0.5">
+                  ⚡ Auto-Enroll with Google
+                </h3>
+                <p className="text-[10px] text-slate-400 font-sans leading-normal mb-3">
+                  Pre-fill your profile details instantly and connect your secure database syncing session.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleLoading}
+                  className="w-full py-2.5 bg-white/5 hover:bg-white/10 active:scale-98 border border-white/10 hover:border-cyan-400/30 rounded-xl text-[10px] font-mono font-bold tracking-widest uppercase flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  🔑 {isGoogleLoading ? 'Connecting Google...' : 'Continue with Google'}
+                </button>
               </div>
             )}
 

@@ -1,5 +1,5 @@
 {
-  "name": "Parkit",
+  "name": "Parkzone",
   "description": "Earn from your space or find parking instantly with real-time availability, live pricing, and seamless space listing.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
