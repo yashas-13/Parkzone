@@ -34,6 +34,7 @@ export default function DriverProfile({
   const [isElectric, setIsElectric] = useState(true);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState('');
+  const [showLegalModal, setShowLegalModal] = useState(false);
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -315,6 +316,15 @@ export default function DriverProfile({
             </div>
 
             <div
+              onClick={() => setShowLegalModal(true)}
+              className="p-4 flex items-center gap-3.5 hover:bg-white/[0.02] border-b border-white/5 transition-colors cursor-pointer text-xs font-semibold text-slate-300"
+            >
+              <span>⚖️</span>
+              <div className="flex-1 text-white">Legal, Grievance & Play Store Info</div>
+              <span className="text-slate-600 font-mono">→</span>
+            </div>
+
+            <div
               onClick={onLogout}
               className="p-4 flex items-center gap-3.5 bg-rose-500/10 hover:bg-rose-500/15 transition-colors cursor-pointer text-xs font-bold text-rose-400"
             >
@@ -427,6 +437,67 @@ export default function DriverProfile({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showLegalModal && (
+        <div className="fixed inset-0 bg-[#050508]/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0a0a14] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-400/5 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <h3 className="font-['Space_Grotesk'] font-bold text-base mb-3.5 text-white flex items-center gap-2">
+              <span>⚖️</span> Compliance & Legal Details
+            </h3>
+
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 text-slate-300 font-sans text-[11px] leading-relaxed">
+              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                <span className="font-mono font-bold text-cyan-400 uppercase tracking-wider block text-[9px] mb-1">
+                  1. Privacy & Consent
+                </span>
+                <p className="text-slate-400 select-text">
+                  Parkzone collects essential registration data (your linked Google account profile details, phone numbers, and vehicle plate numbers) solely to enable automated parking pass creation, gated entry camera recognition, and security verification. Location analytics are strictly used for finding nearest slots.
+                </p>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                <span className="font-mono font-bold text-cyan-400 uppercase tracking-wider block text-[9px] mb-1">
+                  2. Terms of Host Listing
+                </span>
+                <p className="text-slate-400 select-text">
+                  Hosts in Bangalore agree to maintain accurate slot descriptions, clear access instructions, and honor designated pricing. All peer-to-peer parking spot bookings are locally managed. Parkzone is an intermediary interface on top of Google Cloud Run.
+                </p>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                <span className="font-mono font-bold text-emerald-400 uppercase tracking-wider block text-[9px] mb-1 text-emerald-400">
+                  3. Indian IT Act - Grievance Officer
+                </span>
+                <div className="text-slate-400 space-y-1 font-mono text-[10px] select-text">
+                  <p><strong className="text-white">Officer:</strong> Rajesh Gowda</p>
+                  <p><strong className="text-white">Designation:</strong> Grievance Redressal Officer, Parkzone India</p>
+                  <p><strong className="text-white">Email:</strong> grievances@parkzone.in</p>
+                  <p><strong className="text-white">Office:</strong> 80 Feet Rd, Koramangala 4th Block, Bengaluru, KA 560034</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                <span className="font-mono font-bold text-cyan-400 uppercase tracking-wider block text-[9px] mb-1">
+                  4. Google Play Developer Policies
+                </span>
+                <p className="text-slate-400 select-text">
+                  This application features a fully sandboxed/live backup integration using your personal Google Drive for total user data autonomy. Secure account generation utilizes official Google Firebase Authentication API endpoints.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowLegalModal(false)}
+              className="mt-5 w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-xs font-mono font-bold text-white transition-colors cursor-pointer"
+            >
+              Close Documents
+            </button>
           </div>
         </div>
       )}

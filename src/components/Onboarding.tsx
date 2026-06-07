@@ -271,7 +271,7 @@ export default function Onboarding({ onBack, onSubmit }: OnboardingProps) {
                   value={plate}
                   onChange={(e) => setPlate(e.target.value)}
                   className="block w-full h-13 pl-10 pr-10 bg-white/5 border border-white/10 rounded-xl text-white font-['Space_Grotesk'] font-bold uppercase tracking-widest placeholder-slate-500 focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/50 focus:outline-none transition-all"
-                  placeholder="e.g. ABC-1234"
+                  placeholder="e.g. KA-03-MK-1234"
                   type="text"
                 />
                 <div className="absolute inset-y-0 right-4 flex items-center text-slate-500 text-sm select-none cursor-help">

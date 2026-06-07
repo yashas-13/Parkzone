@@ -146,7 +146,7 @@ export default function Splash({
             onClick={onBeHost}
             className="uppercase tracking-wide text-cyan-400 hover:text-cyan-300 transition-colors font-bold cursor-pointer"
           >
-            Earn $ (Host)
+            Earn ₹ (Host)
           </button>
         </div>
       </div>

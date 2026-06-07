@@ -18,9 +18,9 @@ export default function HostWelcome({ onBack, onListSpace, onMaybeLater }: HostW
 
   // Interactive estimates based on space types
   const estimates = {
-    garage: { amount: 480, label: 'Garage', rates: [40, 60, 55, 85, 100, 70] },
-    driveway: { amount: 320, label: 'Driveway', rates: [25, 45, 35, 65, 80, 50] },
-    lot: { amount: 240, label: 'Parking Lot', rates: [20, 30, 28, 48, 60, 42] },
+    garage: { amount: 6500, label: 'Garage', rates: [40, 60, 55, 85, 100, 70] },
+    driveway: { amount: 4200, label: 'Driveway', rates: [25, 45, 35, 65, 80, 50] },
+    lot: { amount: 2800, label: 'Parking Lot', rates: [20, 30, 28, 48, 60, 42] },
   };
 
   const currentEst = estimates[selectedType];
@@ -96,7 +96,7 @@ export default function HostWelcome({ onBack, onListSpace, onMaybeLater }: HostW
                   ESTIMATED SYSTEM YIELD
                 </p>
                 <p className="font-['Space_Grotesk'] text-4xl font-bold text-white tracking-tight">
-                  ${currentEst.amount}.00 <span className="text-xs text-slate-400 font-normal">/mo</span>
+                  ₹{currentEst.amount.toLocaleString('en-IN')} <span className="text-xs text-slate-400 font-normal">/mo</span>
                 </p>
               </div>
               <div className="bg-[#22d3ee]/10 p-3 rounded-2xl text-cyan-400 font-bold text-base border border-cyan-400/20">
@@ -110,7 +110,7 @@ export default function HostWelcome({ onBack, onListSpace, onMaybeLater }: HostW
                 <div key={index} className="flex-1 flex flex-col items-center group">
                   {/* Daily popup on hover */}
                   <div className="absolute opacity-0 group-hover:opacity-100 bottom-24 bg-black border border-white/10 text-cyan-400 text-[9px] font-mono px-1.5 py-0.5 rounded transition-opacity pointer-events-none mb-1 shadow-lg">
-                    ${Math.round(h * 4.8)}/mo
+                    ₹{Math.round(h * 65)}/mo
                   </div>
                   <div
                     className="w-full rounded-t-lg transition-all duration-500"
