@@ -3,13 +3,18 @@
 # real /etc/nginx. Portable between the Ubuntu VPS and Termux.
 #
 #   ./ops/validate-nginx.sh          # syntax check only  (what CI runs)
-#   ./ops/validate-nginx.sh --run    # + boot it on :8081/:8443 and curl it
+#   ./ops/validate-nginx.sh --run        # + boot it on :8081/:8443 and curl it
+#   ./ops/validate-nginx.sh --run --keep # same, but leave nginx running to poke at
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SB="${TMPDIR:-/tmp}/pz-nginx-check"
 RUN=0
-[ "${1:-}" = "--run" ] && RUN=1
+KEEP=0
+for arg in "$@"; do
+  [ "$arg" = "--run" ] && RUN=1
+  [ "$arg" = "--keep" ] && KEEP=1
+done
 
 rm -rf "$SB"
 mkdir -p "$SB"/conf "$SB"/snippets "$SB"/logs "$SB"/public/assets "$SB"/certbot "$SB"/tls
@@ -139,8 +144,13 @@ if [ "$RUN" = 1 ]; then
   else
     printf '  skip    %s\n' 'API proxy checks (backend not running on :8080)'
   fi
-  nginx -s stop -c "$SB/conf/nginx.conf" -p "$SB" 2>/dev/null
+  if [ "$KEEP" = 1 ]; then
+    echo "  kept running: http://127.0.0.1:8081 and https://127.0.0.1:8443 (Host: parkzone.in)"
+    echo "  config: $SB/conf/nginx.conf  (stop with: nginx -s stop -c $SB/conf/nginx.conf -p $SB)"
+  else
+    nginx -s stop -c "$SB/conf/nginx.conf" -p "$SB" 2>/dev/null
     sleep 1
+  fi
   fi
 fi
 

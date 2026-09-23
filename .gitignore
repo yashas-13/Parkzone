@@ -34,3 +34,6 @@ logs/
 *.sqlite3
 mongodump/
 backups/
+
+# --- workspace snapshots (browser-saved HTML of the live domain; not part of repo) ---
+/live.html
