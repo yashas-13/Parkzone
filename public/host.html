@@ -1,70 +1,357 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Host and Earn - ParkZone | Rs 5,000/month from your GPU</title><script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--neon:#00FF88;--bg:#050807}
-*{font-family:'Inter',system-ui,sans-serif}
-.mono{font-family:'JetBrains Mono',monospace}
-body{background:var(--bg);color:#e8ece9;overflow-x:hidden}
-.bg-grid{background-image:linear-gradient(rgba(0,255,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.05) 1px,transparent 1px);background-size:44px 44px}
-.glow-orb{position:absolute;border-radius:9999px;filter:blur(110px);opacity:.25;pointer-events:none}
-.neon{color:var(--neon)}
-.grad-text{background:linear-gradient(92deg,#fff 20%,var(--neon) 60%,#7df9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.glass{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,136,.16);backdrop-filter:blur(14px)}
-.btn-neon{background:linear-gradient(135deg,#00FF88,#00cc6e);color:#03130b;font-weight:800;box-shadow:0 0 24px rgba(0,255,136,.35);transition:.25s}
-.btn-neon:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,255,136,.55)}
-.btn-ghost{border:1px solid rgba(0,255,136,.35);color:var(--neon);transition:.25s}
-.btn-ghost:hover{background:rgba(0,255,136,.1)}
-.gpu-card{transition:.3s;position:relative;overflow:hidden}
-.gpu-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,136,.14)}
-.live-dot{width:8px;height:8px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pl 1.6s infinite}
-@keyframes pl{50%{opacity:.4}}
-@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-.fade-up{animation:fu .7s cubic-bezier(.2,.7,.3,1) both}
-.uptime-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
-.uptime-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00cc6e,var(--neon))}
-.chip{font-size:11px;padding:2px 10px;border-radius:99px;border:1px solid rgba(0,255,136,.3);color:var(--neon);background:rgba(0,255,136,.07);cursor:pointer}
-.chip.on{background:rgba(0,255,136,.2)}
-input,select{background:#0a0f0c;border:1px solid rgba(0,255,136,.25);color:#e8ece9;border-radius:10px}
-input:focus,select:focus{outline:none;border-color:var(--neon)}
-#toast{position:fixed;bottom:24px;right:24px;z-index:99;display:flex;flex-direction:column;gap:8px}
-.toast{background:#0a120d;border:1px solid rgba(0,255,136,.4);border-radius:12px;padding:12px 18px;font-size:14px;animation:fu .3s}
-.modal-bg{background:rgba(0,0,0,.75)}
-.tick{animation:fu .5s both}
-.stat-num{font-size:1.6rem;font-weight:800}
-.faq-a{display:none}
-.faq.open .faq-a{display:block}
-.faq.open .faq-q span:last-child{transform:rotate(45deg)}
-</style></head><body><div class="fixed inset-0 bg-grid pointer-events-none"></div><div class="glow-orb" style="width:560px;height:560px;background:#00FF88;top:-200px;left:50%;transform:translateX(-50%)"></div><nav class="sticky top-0 z-50 border-b border-green-900" style="background:rgba(5,8,7,.85);backdrop-filter:blur(16px)"><div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between"><a href="/gpu/" class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl grid place-items-center font-black text-black text-lg" style="background:linear-gradient(135deg,#00FF88,#00b35c)">P</div><div class="text-xl font-extrabold">PARK<span class="neon">ZONE</span><span class="text-xs text-gray-500">.in/gpu</span></div></a><div class="hidden md:flex items-center gap-7 text-sm"><a href="/gpu/" class="text-gray-300 hover:text-white transition">Marketplace</a><a href="/gpu/host.html" class="neon font-semibold">Host & Earn</a><a href="/gpu/dashboard.html" class="text-gray-300 hover:text-white transition">Dashboard</a></div><div class="flex items-center gap-3"><a href="/gpu/dashboard.html" class="btn-neon text-sm px-5 py-2 rounded-xl">Rent a GPU</a></div></div></nav>
-<header class="relative max-w-5xl mx-auto px-5 pt-16 pb-8 text-center">
-<div class="fade-up chip" style="display:inline-block">HOST PROGRAM - WEEKLY UPI PAYOUTS</div>
-<h1 class="fade-up font-black leading-tight mt-4" style="font-size:clamp(2.2rem,5vw,3.4rem);animation-delay:.08s">Earn <span class="grad-text">Rs 5,000/month</span><br>from your gaming PC</h1>
-<p class="fade-up text-gray-400 mt-4 max-w-xl mx-auto" style="animation-delay:.16s">Park your idle GPU. We fill it with AI jobs. Renter code runs inside Docker only. You get paid weekly via UPI.</p>
-<div class="fade-up mt-7 flex flex-wrap justify-center gap-3" style="animation-delay:.24s"><a href="/gpu/agent.exe" download class="btn-neon px-8 py-4 rounded-2xl text-base">Download agent for Windows</a><a href="/gpu/" class="btn-ghost px-8 py-4 rounded-2xl font-semibold">See live demand</a></div>
-<p class="text-xs text-gray-600 mt-3 mono">agent.exe - Windows 10/11 - NVIDIA GPU - Docker Desktop w/ WSL2</p></div></header>
-<main class="relative max-w-6xl mx-auto px-5 pb-20">
-<div class="grid md:grid-cols-3 gap-4">
-<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">1</div><b class="block mt-4">Download</b><p class="text-sm text-gray-400 mt-2">Get agent.exe, install Docker Desktop with WSL2 GPU support. 50 MB, no admin needed.</p></div>
-<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">2</div><b class="block mt-4">Install</b><p class="text-sm text-gray-400 mt-2">Run agent, enter email + city + hourly price. It heartbeats every 30s and appears on the marketplace.</p></div>
-<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">3</div><b class="block mt-4">Start earning</b><p class="text-sm text-gray-400 mt-2">Renters pay per minute into your wallet. Weekly UPI payouts, Rs 500 minimum.</p></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Host &amp; Earn - Rent out your idle GPU | Rs 5,000/month | ParkZone</title>
+<meta name="description" content="Park your idle NVIDIA GPU on ParkZone and earn around Rs 5,000 a month. You set the hourly price and keep 100% of it. Windows agent, Docker isolation, weekly UPI payouts.">
+<meta name="theme-color" content="#05070a">
+<meta name="robots" content="index, follow">
+<meta name="pz-api-base" content="/api">
+<meta name="pz-poll-ms" content="15000">
+<link rel="canonical" href="https://parkzone.in/host">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ParkZone">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Host &amp; Earn - rent out your idle GPU">
+<meta property="og:description" content="Keep 100% of the price you set. Weekly UPI payouts. Renters run inside Docker, never on your desktop.">
+<meta property="og:url" content="https://parkzone.in/host">
+<meta property="og:image" content="https://parkzone.in/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ParkZone host program">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Host &amp; Earn on ParkZone">
+<meta name="twitter:description" content="Your idle GPU, paid weekly in rupees.">
+<meta name="twitter:image" content="https://parkzone.in/assets/og.png">
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/pz.css">
+<script src="/assets/pz.js" defer></script>
+<script src="/assets/page-host.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="decor" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-c"></div>
 </div>
-<div class="glass rounded-3xl p-7 mt-6">
-<h2 class="font-extrabold text-xl">Earnings calculator</h2>
-<p class="text-sm text-gray-500">Move the sliders - you keep 100% of your set price</p>
-<div class="grid md:grid-cols-3 gap-5 mt-5">
-<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Your price</span><span class="mono neon font-bold" id="vP">Rs 21/hr</span></div><input id="p" type="range" min="5" max="80" value="21" class="w-full"></div>
-<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Hours / day</span><span class="mono neon font-bold" id="vH">8h</span></div><input id="h" type="range" min="1" max="24" value="8" class="w-full"></div>
-<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Days / month</span><span class="mono neon font-bold" id="vD">25</span></div><input id="d" type="range" min="1" max="30" value="25" class="w-full"></div>
-</div>
-<div class="flex flex-wrap items-end gap-6 mt-6"><div><div class="text-xs text-gray-500">YOU EARN</div><div id="out" class="text-4xl font-black neon mono">Rs 4,200</div></div><div class="pb-1"><div class="text-xs text-gray-500">RENTER PAYS (incl. fee)</div><div id="outR" class="text-xl font-bold mono">Rs 5,800</div></div><div class="pb-1"><div class="text-xs text-gray-500">vs AWS (~Rs 98/hr 4090)</div><div id="outS" class="text-xl font-bold mono neon">saves 70%</div></div></div>
-</div>
-<h2 class="font-extrabold text-xl mt-10 mb-4">FAQ</h2>
-<div class="space-y-3" id="faqs">
-<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">Is my PC safe?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Renter code runs inside Docker only, never directly on Windows. You can set active hours and kill any job instantly.</p></div>
-<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">When do I get paid?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Weekly UPI payouts, Rs 500 minimum. Billing is per-minute, tracked in your wallet.</p></div>
-<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">What cut does ParkZone take?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Display price = ceil(your price x 1.38). You keep 100% of your set price.</p></div>
-<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">What do I need?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Windows 10/11, NVIDIA GPU (6GB+ VRAM), Docker Desktop, 20+ Mbps upload.</p></div>
-</div></main>
-<footer class="border-t border-green-900 py-8 text-center text-xs text-gray-600">PARK<span class="neon">ZONE</span>.in/gpu - Vast.ai-grade power, desi prices - <a class="hover:text-gray-300" href="/gpu/host.html">Host</a> - <a class="hover:text-gray-300" href="/gpu/dashboard.html">Dashboard</a></footer><div id="toast"></div><script>
-function $(id){return document.getElementById(id)}
-function fmt(n){return n.toLocaleString('en-IN')}
-function calc(){var p=+$('p').value,h=+$('h').value,d=+$('d').value;$('vP').textContent='Rs '+p+'/hr';$('vH').textContent=h+'h';$('vD').textContent=d;$('out').textContent='Rs '+fmt(p*h*d);var r=Math.ceil(p*1.38);$('outR').textContent='Rs '+fmt(r*h*d);var s=Math.round((1-(r/98))*100);$('outS').textContent='saves '+s+'%'}
-['p','h','d'].forEach(function(i){$(i).addEventListener('input',calc)});calc();
-var fs=document.querySelectorAll('.faq');for(var i=0;i<fs.length;i++){fs[i].onclick=function(){this.classList.toggle('open')}}
-</script></body></html>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/">Marketplace</a>
+      <a href="/host" aria-current="page">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="badge badge-live nowrap"><span class="dot"></span><span id="hostDemand">loading</span></span>
+      <a class="btn btn-primary btn-sm" href="#download">Get the agent</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navDrawer" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="container">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+      <a class="btn btn-primary btn-block mt-4" href="#download">Get the agent</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+
+  <!-- ============================================================ HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-badge reveal"><span class="dot"></span><span>Host program - weekly UPI payouts - no listing fee</span></p>
+      <h1 class="h1 mt-5 reveal grad">Your GPU earns while you sleep.</h1>
+      <p class="lead mt-5 reveal">Park the card that is idle after 9pm and earn around <b class="neon">Rs 5,000 a month</b>. You set the hourly price and keep 100% of it - ParkZone adds its fee on top for the renter. Renters only ever touch a Docker container, never your desktop.</p>
+      <div class="btn-row mt-6 reveal">
+        <a class="btn btn-primary btn-lg" href="#download" id="heroDownload">Download the Windows agent</a>
+        <a class="btn btn-ghost btn-lg" href="#calculator">Estimate my earnings</a>
+      </div>
+      <div class="row mt-6 reveal">
+        <span class="chip">Windows 10 / 11</span>
+        <span class="chip">NVIDIA GPU, 6 GB+ VRAM</span>
+        <span class="chip">Docker Desktop with WSL2</span>
+        <span class="chip">20 Mbps upload</span>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-tile reveal"><div class="stat"><span class="stat-num neon" id="demandGpus">0</span><span class="stat-label">GPUs parked right now</span></div></div>
+        <div class="stat-tile reveal"><div class="stat"><span class="stat-num" id="demandAvg">-</span><span class="stat-label">average live renter price /hr</span></div></div>
+        <div class="stat-tile reveal"><div class="stat"><span class="stat-num" id="demandCities">0</span><span class="stat-label">cities with hosts online</span></div></div>
+        <div class="stat-tile reveal"><div class="stat"><span class="stat-num">100%</span><span class="stat-label">of your price stays yours</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== CALCULATOR -->
+  <section class="section" id="calculator">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Earnings calculator</p>
+        <h2 class="h2 mt-2">Work out what your card is worth.</h2>
+        <p class="lead mt-3">Set the price you want, the hours you are happy to be rented, and see the month. You keep every rupee of the rate you choose - the renter pays ParkZone's fee on top.</p>
+      </div>
+      <div class="split">
+        <div class="card card-pad card-brand">
+          <div class="calc">
+            <div class="field">
+              <label class="label" for="hRate">Your price per hour - <span class="mono neon" id="hRateOut">Rs 21</span></label>
+              <input id="hRate" type="range" min="5" max="80" step="1" value="21">
+              <span class="hint">Most 4090 hosts ask Rs 21-25. Cheap cards start around Rs 9.</span>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label class="label" for="hHours">Rentable hours per day - <span class="mono neon" id="hHoursOut">8h</span></label>
+                <input id="hHours" type="range" min="1" max="24" step="1" value="8">
+              </div>
+              <div class="field">
+                <label class="label" for="hDays">Days per month - <span class="mono neon" id="hDaysOut">25</span></label>
+                <input id="hDays" type="range" min="1" max="30" step="1" value="25">
+              </div>
+            </div>
+            <hr>
+            <div class="calc-out">
+              <div>
+                <div class="stat-label">You earn per month</div>
+                <div class="calc-big" id="hEarn">Rs 4,200</div>
+              </div>
+              <div>
+                <div class="stat-label">Renter pays</div>
+                <div class="calc-side muted" id="hRenter">Rs 5,796</div>
+              </div>
+              <div>
+                <div class="stat-label">Electricity at Rs 9/unit, 300 W</div>
+                <div class="calc-side faint" id="hPower">Rs 1,620</div>
+              </div>
+            </div>
+            <hr>
+            <div class="kv">
+              <div class="kv-row"><span>Net after power</span><span class="neon bold" id="hNet">Rs 2,580</span></div>
+              <div class="kv-row"><span>Payout schedule</span><span>Weekly, every Monday</span></div>
+              <div class="kv-row"><span>Payout method</span><span>UPI, Rs 500 minimum</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card card-pad reveal">
+            <h3 class="h3">What renter demand looks like</h3>
+            <p class="small muted mt-2">Live numbers from the marketplace. When hosts are scarce, prices rise - and you set yours.</p>
+            <div class="grid-2 mt-4">
+              <div class="stat-tile"><div class="stat"><span class="stat-num neon mono" id="liveCount">0</span><span class="stat-label">GPUs online</span></div></div>
+              <div class="stat-tile"><div class="stat"><span class="stat-num mono" id="liveLow">-</span><span class="stat-label">cheapest /hr</span></div></div>
+              <div class="stat-tile"><div class="stat"><span class="stat-num mono" id="liveHigh">-</span><span class="stat-label">highest /hr</span></div></div>
+              <div class="stat-tile"><div class="stat"><span class="stat-num mono" id="liveUptime">-</span><span class="stat-label">average uptime</span></div></div>
+            </div>
+            <p class="tiny faint mt-4" id="liveUpdated">Waiting for marketplace data.</p>
+          </div>
+          <div class="card card-pad mt-4 reveal">
+            <h3 class="h3">Set active hours, stay in control</h3>
+            <p class="small muted mt-2">The agent only advertises your GPU while you allow it. Stop the agent and your listing disappears from the marketplace within two minutes - no orphaned sessions, no surprise bills for the renter either.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================= DOWNLOAD -->
+  <section class="section" id="download">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Three steps</p>
+        <h2 class="h2 mt-2">Listed in under five minutes.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <b>Download the agent</b>
+          <p>A single Windows executable. Install Docker Desktop with WSL2 GPU support first - that is the container runtime your renters' jobs run inside.</p>
+          <a class="btn btn-primary mt-4" href="/agent.exe" download>Download agent.exe</a>
+          <p class="tiny faint mt-2 mono" id="agentMeta">SHA-256 published on the release page</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <b>Run it and answer three questions</b>
+          <p>Email for payouts, your city, and the hourly price you want. The agent writes <span class="mono">~/.parkzone.json</span> and starts sending a heartbeat every 30 seconds.</p>
+          <div class="code-row mt-4">
+            <code id="agentCmd">.\agent.exe</code>
+            <button class="btn btn-quiet btn-sm" type="button" data-copy=".\\agent.exe">Copy</button>
+          </div>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <b>Get paid every Monday</b>
+          <p>Renters pay per minute into your balance. Once you cross Rs 500 we send a UPI payout - no invoice chasing, no minimum contract, no exclusivity.</p>
+          <a class="btn btn-ghost mt-4" href="/status">See platform status</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================================================== REQUIREMENTS -->
+  <section class="section section-tight" id="requirements">
+    <div class="container">
+      <div class="row-between mb-5">
+        <div class="section-head">
+          <p class="eyebrow">Before you start</p>
+          <h2 class="h2 mt-2">Requirements and expectations.</h2>
+        </div>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="table">
+          <caption class="sr-only">Host requirements for ParkZone</caption>
+          <thead><tr><th scope="col">Item</th><th scope="col">Required</th><th scope="col">Why</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Operating system</th><td>Windows 10 or 11 (64-bit)</td><td>WSL2 gives the container access to the GPU</td></tr>
+            <tr><th scope="row">GPU</th><td>NVIDIA, 6 GB VRAM or more</td><td>Smaller cards still rent, just at lower prices</td></tr>
+            <tr><th scope="row">Drivers</th><td>NVIDIA driver 535 or newer</td><td>Required by the CUDA containers renters pick</td></tr>
+            <tr><th scope="row">Docker</th><td>Docker Desktop with WSL2 backend</td><td>Renter workloads are isolated in a container</td></tr>
+            <tr><th scope="row">Network</th><td>20 Mbps upload, no aggressive NAT blocks</td><td>SSH and Jupyter endpoints must be reachable</td></tr>
+            <tr><th scope="row">Power</th><td>Stable supply, ideally not a laptop on battery</td><td>Interrupted hosts lose uptime score and rentals</td></tr>
+            <tr><th scope="row">Uptime mindset</th><td>Evenings and nights are the sweet spot</td><td>Low uptime means fewer rentals and lower ranking</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= SAFETY -->
+  <section class="section" id="safety">
+    <div class="container">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Safety</p>
+          <h2 class="h2 mt-2">A renter never gets your desktop.</h2>
+          <p class="lead mt-3">This is the part that decides whether hosting is sane or terrifying. On ParkZone, renter code runs inside a Docker container with hard limits, and you hold the kill switch the whole time.</p>
+          <div class="grid-2 mt-5">
+            <div class="card card-pad"><b class="block">Container isolation</b><p class="small muted mt-2">Workloads execute inside Docker, never on Windows directly. No filesystem, registry or browser access to your machine.</p></div>
+            <div class="card card-pad"><b class="block">Resource caps</b><p class="small muted mt-2">Memory, CPU and process limits are applied to every container so one job cannot wedge your PC.</p></div>
+            <div class="card card-pad"><b class="block">Approved images only</b><p class="small muted mt-2">Renters pick from an allow-list of well-known images. Arbitrary images and mining payloads are rejected by the API.</p></div>
+            <div class="card card-pad"><b class="block">Your kill switch</b><p class="small muted mt-2">Close the agent or pull the network cable. Running instances stop billing and the listing leaves the marketplace within two minutes.</p></div>
+            <div class="card card-pad"><b class="block">Your hours, your rules</b><p class="small muted mt-2">Only advertise while you are asleep, at work, or gaming-free. Nothing is rented outside the window you allow.</p></div>
+            <div class="card card-pad"><b class="block">No exclusivity</b><p class="small muted mt-2">No contract, no lock-in, no penalty for switching off. Delete the agent and you are out.</p></div>
+          </div>
+        </div>
+        <div class="card card-pad reveal">
+          <p class="eyebrow">Profit maths</p>
+          <h3 class="h3 mt-2">Rs 21/hr, 8 hours, 25 days</h3>
+          <div class="kv mt-4">
+            <div class="kv-row"><span>Gross rental income</span><span class="neon">Rs 4,200</span></div>
+            <div class="kv-row"><span>ParkZone listing fee</span><span class="neon">Rs 0</span></div>
+            <div class="kv-row"><span>Electricity (300 W, Rs 9/unit)</span><span>about Rs 1,620</span></div>
+            <div class="kv-row"><span>Net in your pocket</span><span class="bold">about Rs 2,580</span></div>
+          </div>
+          <p class="tiny faint mt-4">Assumes a 300 W draw at Rs 9 per unit. A 3060 at Rs 12/hr and 5 hours a night still clears roughly Rs 1,100 a month after power - enough to cover the card's own electricity and then some.</p>
+          <a class="btn btn-primary btn-block mt-5" href="#calculator">Recalculate with my numbers</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= PAYOUTS -->
+  <section class="section section-tight" id="payouts">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Money</p>
+        <h2 class="h2 mt-2">How and when you get paid.</h2>
+      </div>
+      <div class="grid-3">
+        <div class="step reveal"><div class="step-num">1</div><b>Renters pay per minute</b><p>Every started minute is debited from the renter's wallet at your rate plus ParkZone's fee, and credited to your host balance.</p></div>
+        <div class="step reveal"><div class="step-num">2</div><b>Balance reaches Rs 500</b><p>Below that it simply rolls over. There is no charge for staying under the threshold and no expiry on your balance.</p></div>
+        <div class="step reveal"><div class="step-num">3</div><b>Monday UPI payout</b><p>We sweep cleared balances every Monday to the UPI ID on your host profile. Payout reference appears in your console ledger.</p></div>
+      </div>
+      <p class="tiny faint mt-5">Payouts are subject to KYC for amounts above the statutory threshold. Tax on rental income is the host's responsibility; we provide a statement of earnings for your filings.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================= FAQ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Host questions</p>
+          <h2 class="h2 mt-2">The awkward questions, answered.</h2>
+          <p class="lead mt-3">Anything else? Mail <a class="neon" href="mailto:hosts@parkzone.in">hosts@parkzone.in</a> - a human replies, usually the same day.</p>
+        </div>
+        <div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Can a renter see my files or install malware?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>No. Jobs run inside a Docker container, not on Windows. The container cannot read your drives, and only allow-listed images can be launched, so a renter cannot pull an arbitrary payload. You also keep the ability to stop everything instantly.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Will it slow my PC down while I am using it?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Only while a rental is active, and only within the hours you allow. Most hosts rent overnight. If a job is running and you want your machine back, stop the agent - the instance is terminated and billing ends.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">What cut does ParkZone take?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>None of your headline price. You keep 100% of the hourly rate you set. ParkZone's fee is added on top, so a Rs 21/hr price shows as Rs 29/hr to the renter and Rs 21/hr lands in your balance.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">What if a rental is disputed or the PC crashes mid-job?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Billing stops when the instance stops. If a job never came up, the renter's credit is returned automatically. Repeated crashes lower your uptime score, which lowers your marketplace ranking - so stability is directly in your interest.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Is crypto mining allowed?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>No. Mining payloads and unauthorized images are blocked by the image allow-list and are grounds for removal. ParkZone is for AI training, inference, rendering and development workloads.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">How do I stop hosting for good?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Close the agent and delete the executable. Your listing drops out of the marketplace within two minutes, any running instance is stopped, and you can request the remaining balance as a payout or a refund.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="container">
+      <div class="card card-pad card-brand center reveal">
+        <h2 class="h2">Your GPU is idle right now.</h2>
+        <p class="lead mt-3">Two minutes of setup, weekly rupees, and a kill switch you control.</p>
+        <div class="btn-row mt-5 center">
+          <a class="btn btn-primary btn-lg" href="/agent.exe" download>Download agent.exe</a>
+          <a class="btn btn-quiet btn-lg" href="/">Browse the marketplace</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span></a>
+        <p class="small muted mt-4">India's GPU parking marketplace. Hosts keep 100% of the price they set, renters pay by the minute.</p>
+        <p class="tiny faint mt-3 mono">hosts@parkzone.in</p>
+      </div>
+      <div class="foot-col"><h3>Rent</h3><a href="/">Live marketplace</a><a href="/#pricing">Price comparison</a><a href="/dashboard">Console</a><a href="/api/docs">API reference</a></div>
+      <div class="foot-col"><h3>Host</h3><a href="#calculator">Earnings calculator</a><a href="#download">Download agent</a><a href="#safety">Safety and isolation</a><a href="/status">Platform status</a></div>
+      <div class="foot-col"><h3>Company</h3><a href="/terms">Terms of service</a><a href="/privacy">Privacy and DPDP</a><a href="/refund">Refund policy</a><a href="mailto:hosts@parkzone.in">Contact</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>Copyright <span data-year>2026</span> ParkZone. All rights reserved.</span>
+      <span>Made in India - parkzone.in - single domain, always</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast-wrap" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+# ParkZone API - systemd unit. Copy to /etc/systemd/system/parkzone-api.service
+#
+#   sudo useradd --system --home /var/www/parkzone --shell /usr/sbin/nologin parkzone
+#   sudo cp ops/parkzone-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now parkzone-api
+#
+# The API listens on loopback only; nginx terminates TLS and proxies /api/*.
+# Paths deliberately go through the `current` symlink so a release flip is atomic.
+
+[Unit]
+Description=ParkZone API (FastAPI + uvicorn on 127.0.0.1:8080)
+Documentation=https://parkzone.in/api/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=parkzone
+Group=parkzone
+WorkingDirectory=/var/www/parkzone/current/backend
+
+# Secrets live here, never in the repository (chmod 600, owner parkzone:parkzone)
+EnvironmentFile=/var/www/parkzone/current/backend/.env
+Environment=PATH=/var/www/parkzone/current/.venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+# Refuse to start if the database is unreachable
+ExecStartPre=/var/www/parkzone/current/.venv/bin/python -c "import db; db.get_db(); db.ping(); print('mongo ok')"
+ExecStart=/var/www/parkzone/current/.venv/bin/uvicorn main:app --host 127.0.0.1 --port 8080 --workers 2 --proxy-headers --forwarded-allow-ips=127.0.0.1
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SystemCallArchitectures=native
+UMask=0077
+
+Restart=always
+RestartSec=3
+StartLimitBurst=10
+StartLimitIntervalSec=60
+TimeoutStopSec=30
+KillSignal=SIGTERM
+KillMode=mixed
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=parkzone-api
+
+[Install]
+WantedBy=multi-user.target

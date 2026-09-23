@@ -1,0 +1,8 @@
+# ParkZone - parkzone.in only
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /agent.exe
+
+Sitemap: https://parkzone.in/sitemap.xml

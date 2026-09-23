@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Refund policy and grievance officer - ParkZone</title>
+<meta name="description" content="When ParkZone refunds GPU rental credit, how long it takes, how failed instances are handled, and how to escalate a complaint.">
+<meta name="theme-color" content="#05070a">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://parkzone.in/refund">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ParkZone">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Refund policy and grievance officer - ParkZone">
+<meta property="og:description" content="When ParkZone refunds GPU rental credit, how long it takes, how failed instances are handled, and how to escalate a complaint.">
+<meta property="og:url" content="https://parkzone.in/refund">
+<meta property="og:image" content="https://parkzone.in/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ParkZone - Indian GPUs for Indian AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Refund policy and grievance officer - ParkZone">
+<meta name="twitter:description" content="When ParkZone refunds GPU rental credit, how long it takes, how failed instances are handled, and how to escalate a complaint.">
+<meta name="twitter:image" content="https://parkzone.in/assets/og.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/pz.css">
+<script src="/assets/pz.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="decor" aria-hidden="true"><div class="bg-grid"></div><div class="orb orb-a"></div></div>
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>
+        <span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span>
+        <span class="sr-only">home</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="badge badge-live nowrap"><span class="dot"></span><span id="navCount">loading</span></span>
+      <a class="btn btn-primary btn-sm" href="#market">Rent a GPU</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navDrawer" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="container">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+      <a class="btn btn-primary btn-block mt-4" href="#market">Rent a GPU</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <section class="section">
+    <div class="container">
+      <h1 class="h1">Refund policy</h1>
+      <p class="doc-meta mt-4"><span>Version 1.0</span><span>Effective 1 October 2026</span><span>Applies to renters and hosts</span></p>
+      <p class="lead mt-4">We would rather be clear than clever about money. Here is exactly when you get credit back and when you do not.</p>
+      <div class="doc mt-6">
+        <section>
+          <h2>Automatic credit - no request needed</h2>
+          <ul>
+            <li><strong>Instance never started.</strong> If a rental fails to reach running state, the hold is released and nothing is charged.</li>
+            <li><strong>Host went offline mid-session.</strong> Billing stops at the last measured minute; you are not charged for time the host was unreachable.</li>
+            <li><strong>Duplicate charge.</strong> Rentals and top-ups carry idempotency keys, so a retried request cannot bill twice. If one slips through, it is reversed in full.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Unused wallet balance</h2>
+          <p>Your unspent balance is your money. Ask for it back within <strong>7 days</strong> of your last top-up and it is refunded to the original payment method in full - no restocking fee, no minimum. After 7 days the balance stays in your wallet for future rentals and remains refundable at any time.</p>
+          <ul>
+            <li>Refund window: 7 days from top-up for a no-questions cash refund; any time for a wallet-credit return to source.</li>
+            <li>Processing time: 5 to 7 working days to the original UPI account, card or bank account, depending on the payment rail.</li>
+            <li>Partial refunds are supported: tell us the amount, and the rest stays as wallet credit.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>What is not refundable</h2>
+          <ul>
+            <li>Minutes already consumed by a running instance. Compute was delivered and the host must be paid.</li>
+            <li>Rentals stopped for breaching the <a href="/terms">terms of service</a>, including mining payloads or abuse. Those balances are forfeited.</li>
+            <li>Time lost to your own misconfiguration - a broken image layer, a runaway script, or forgetting to stop an instance.</li>
+            <li>Third-party costs you incurred outside ParkZone, such as cloud egress or your own internet charges.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Host payouts</h2>
+          <p>Hosts are paid weekly once the balance crosses Rs 500. A payout can be held where a rental is under dispute or a chargeback has been received; the hold is released or reversed once the dispute closes. Hosts who stop hosting can request the full remaining balance as a payout within 30 days.</p>
+        </section>
+        <section>
+          <h2>Invoices and tax</h2>
+          <p>GST-compliant invoices are available for every top-up and rental period and can be downloaded from your console. Business accounts can add a GSTIN to their profile so the invoice is issued to the company rather than the individual.</p>
+        </section>
+        <section>
+          <h2>How to request a refund</h2>
+          <ol>
+            <li>Mail <a href="mailto:refunds@parkzone.in">refunds@parkzone.in</a> from the address on your account.</li>
+            <li>Include the instance id or top-up reference shown in your ledger, plus the amount.</li>
+            <li>We acknowledge within 24 hours and tell you the outcome in writing. Approved refunds are initiated the same working day.</li>
+          </ol>
+        </section>
+        <section id="grievance">
+          <h2>Grievance officer</h2>
+          <p>If a refund decision does not satisfy you, escalate to the grievance officer appointed under the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021:</p>
+          <ul>
+            <li>Grievance Officer, ParkZone - <a href="mailto:grievance@parkzone.in">grievance@parkzone.in</a></li>
+            <li>Acknowledgement within 24 hours; resolution within 15 days.</li>
+            <li>Postal address: published in the footer of your invoice. The registered-office address is available on request.</li>
+          </ul>
+          <p class="doc-note">Nothing in this policy limits your rights under the Consumer Protection Act, 2019, including your right to approach a consumer commission.</p>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span></a>
+        <p class="small muted mt-4">India's GPU parking marketplace. Rent by the minute, host from your gaming PC, pay and get paid in rupees.</p>
+        <p class="tiny faint mt-3 mono">support@parkzone.in</p>
+      </div>
+      <div class="foot-col">
+        <h3>Rent</h3>
+        <a href="#market">Live marketplace</a>
+        <a href="#pricing">Price comparison</a>
+        <a href="#savings">Savings calculator</a>
+        <a href="/dashboard">Console</a>
+        <a href="/api/docs">API reference</a>
+      </div>
+      <div class="foot-col">
+        <h3>Host</h3>
+        <a href="/host">Host &amp; earn</a>
+        <a href="/agent.exe">Download agent</a>
+        <a href="/host#faq">Host FAQ</a>
+        <a href="/status">Platform status</a>
+      </div>
+      <div class="foot-col">
+        <h3>Company</h3>
+        <a href="/terms">Terms of service</a>
+        <a href="/privacy">Privacy and DPDP</a>
+        <a href="/refund">Refund policy</a>
+        <a href="/refund#grievance">Grievance officer</a>
+        <a href="mailto:support@parkzone.in">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Copyright <span data-year>2026</span> ParkZone. All rights reserved.</span>
+      <span>Made in India - parkzone.in - single domain, always</span>
+    </div>
+  </div>
+</footer>
+<div class="toast-wrap" role="status" aria-live="polite"></div>
+</body>
+</html>

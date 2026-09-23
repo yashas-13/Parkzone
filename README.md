@@ -59,8 +59,10 @@ sudo python3 -m venv /var/www/parkzone/.venv
 sudo /var/www/parkzone/.venv/bin/pip install -r /var/www/parkzone/backend/requirements.txt
 sudo /var/www/parkzone/.venv/bin/pip install -r /var/www/parkzone/backend/requirements-prod-extras.txt
 
-# 3. secrets: create /var/www/parkzone/backend/.env from .env.example (chmod 600)
-#    PZ_DEV_MODE=false, real MONGO_URI (least-privilege app user), PZ_ADMIN_TOKEN
+# 3. secrets (kept OUTSIDE releases, deploy copies them in per release):
+#      sudo install -o root -g parkzone -m 640 backend/.env /var/www/parkzone/backend/.env
+#    with PZ_DEV_MODE=false, a real MONGO_URI least-privilege app user, PZ_ADMIN_TOKEN
+#    and PZ_HOST_TOKEN (same secret the Windows agents send)
 
 # 4. nginx
 sudo cp ops/pz-security-headers.conf /etc/nginx/snippets/pz-security-headers.conf

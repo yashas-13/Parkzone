@@ -1,0 +1,17 @@
+{
+  "name": "ParkZone - rent Indian GPUs by the minute",
+  "short_name": "ParkZone",
+  "description": "India's GPU marketplace. Rent an RTX 4090 by the minute, or park your idle GPU and earn.",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#05070a",
+  "theme_color": "#05070a",
+  "lang": "en-IN",
+  "categories": ["business", "developer", "productivity"],
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy and DPDP notice - ParkZone</title>
+<meta name="description" content="What ParkZone collects, why, how long it is kept, who it is shared with, and your rights under India's Digital Personal Data Protection Act, 2023.">
+<meta name="theme-color" content="#05070a">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://parkzone.in/privacy">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ParkZone">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Privacy and DPDP notice - ParkZone">
+<meta property="og:description" content="What ParkZone collects, why, how long it is kept, who it is shared with, and your rights under India's Digital Personal Data Protection Act, 2023.">
+<meta property="og:url" content="https://parkzone.in/privacy">
+<meta property="og:image" content="https://parkzone.in/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ParkZone - Indian GPUs for Indian AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Privacy and DPDP notice - ParkZone">
+<meta name="twitter:description" content="What ParkZone collects, why, how long it is kept, who it is shared with, and your rights under India's Digital Personal Data Protection Act, 2023.">
+<meta name="twitter:image" content="https://parkzone.in/assets/og.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/pz.css">
+<script src="/assets/pz.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="decor" aria-hidden="true"><div class="bg-grid"></div><div class="orb orb-a"></div></div>
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>
+        <span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span>
+        <span class="sr-only">home</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="badge badge-live nowrap"><span class="dot"></span><span id="navCount">loading</span></span>
+      <a class="btn btn-primary btn-sm" href="#market">Rent a GPU</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navDrawer" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="container">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+      <a class="btn btn-primary btn-block mt-4" href="#market">Rent a GPU</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <section class="section">
+    <div class="container">
+      <h1 class="h1">Privacy notice</h1>
+      <p class="doc-meta mt-4"><span>Version 1.0</span><span>Effective 1 October 2026</span><span>Framework: DPDP Act, 2023</span></p>
+      <p class="lead mt-4">Short version: we collect the minimum needed to meter GPU rentals and pay hosts, we do not sell data, and there are no advertising trackers on this site.</p>
+      <div class="doc mt-6">
+        <section>
+          <h2>What we collect</h2>
+          <ul>
+            <li><strong>Account data</strong> - your email address, because it is your identity and your wallet's key.</li>
+            <li><strong>Billing data</strong> - wallet top-ups, per-minute charges, instance balances, payout references. Monetary values are stored as integers in paise.</li>
+            <li><strong>Host telemetry</strong> - GPU model, VRAM, city, your chosen hourly price, and a heartbeat timestamp every 30 seconds. This is what makes a live marketplace possible.</li>
+            <li><strong>Instance metadata</strong> - instance id, host id, container image, SSH and Jupyter port numbers, status and timestamps.</li>
+            <li><strong>Technical data</strong> - server logs of requests: path, status code, latency, and the IP address making the request, used for rate limiting, abuse prevention and incident forensics.</li>
+          </ul>
+          <div class="doc-note mt-4"><p><strong>What we never collect:</strong> the contents of your notebooks, datasets, prompts, model weights, containers or terminal traffic. ParkZone has no visibility into workload data.</p></div>
+        </section>
+        <section>
+          <h2>Why we process it</h2>
+          <ul>
+            <li>To provide the service you asked for: metering a rental and issuing SSH details (performance of a contract).</li>
+            <li>To take payment, and to prevent fraud and abuse such as mining payloads (legitimate purposes, and our legal obligations).</li>
+            <li>To keep the marketplace honest: uptime scores and ranking (legitimate purpose).</li>
+            <li>To meet tax, accounting and KYC obligations (legal obligation).</li>
+          </ul>
+          <p>We do not use your data for advertising, and we do not build ad profiles.</p>
+        </section>
+        <section>
+          <h2>Who we share it with</h2>
+          <ul>
+            <li><strong>The other side of a transaction</strong> - a host sees the rental exists and its ports; a renter sees the host's card, city and price. Email addresses are not published in the marketplace.</li>
+            <li><strong>Payment gateway</strong> - for processing top-ups and payouts, once enabled.</li>
+            <li><strong>Infrastructure providers</strong> - the database and server hosting this service.</li>
+            <li><strong>Authorities</strong> - where we are legally compelled, and only to the extent compelled.</li>
+          </ul>
+          <p>We do not sell personal data and we do not share it with data brokers.</p>
+        </section>
+        <section>
+          <h2>How long we keep it</h2>
+          <ul>
+            <li>Ledger and billing records: 8 years, as required for tax and accounting purposes.</li>
+            <li>Instance metadata: 90 days rolling.</li>
+            <li>Host heartbeats: the live record plus 30 days.</li>
+            <li>Request logs: 30 days.</li>
+            <li>On a verified deletion request, everything not required by law is erased within 30 days.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Your rights</h2>
+          <p>Under the Digital Personal Data Protection Act, 2023 you can ask to access your data, correct it, erase it, withdraw consent, nominate someone to exercise your rights, and complain to the Data Protection Board. Write to <a href="mailto:privacy@parkzone.in">privacy@parkzone.in</a> from the address on your account and we will respond within 30 days. You can also export your ledger from the console.</p>
+        </section>
+        <section>
+          <h2>Security</h2>
+          <p>TLS everywhere, HTTP strictly redirected to HTTPS. The database is reachable only from the application server using a least-privilege account, and secrets live in server-side environment files rather than the repository. Access to production is logged. No system is perfect - if you find a vulnerability, mail <a href="mailto:security@parkzone.in">security@parkzone.in</a> and we will credit you.</p>
+        </section>
+        <section>
+          <h2>Cookies and local storage</h2>
+          <p>This site sets no advertising or analytics cookies. Your browser's local storage holds two things: the email you last used (so the console greets you) and a UI preference. Both stay on your device and can be cleared at any time. Fonts are self-hosted, so loading a page does not leak your IP to a third-party font CDN.</p>
+        </section>
+        <section>
+          <h2>Children</h2>
+          <p>The service is for adults. We do not knowingly process data of anyone under 18; if you believe a minor has an account, tell us and we will remove it.</p>
+        </section>
+        <section>
+          <h2>Grievance officer</h2>
+          <p>In accordance with the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021:</p>
+          <ul>
+            <li>Grievance Officer, ParkZone - <a href="mailto:grievance@parkzone.in">grievance@parkzone.in</a></li>
+            <li>Acknowledgement within 24 hours, resolution within 15 days of receipt.</li>
+            <li>Postal address is available on request and is published in the footer of the invoiced account once the registered office address is finalised.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span></a>
+        <p class="small muted mt-4">India's GPU parking marketplace. Rent by the minute, host from your gaming PC, pay and get paid in rupees.</p>
+        <p class="tiny faint mt-3 mono">support@parkzone.in</p>
+      </div>
+      <div class="foot-col">
+        <h3>Rent</h3>
+        <a href="#market">Live marketplace</a>
+        <a href="#pricing">Price comparison</a>
+        <a href="#savings">Savings calculator</a>
+        <a href="/dashboard">Console</a>
+        <a href="/api/docs">API reference</a>
+      </div>
+      <div class="foot-col">
+        <h3>Host</h3>
+        <a href="/host">Host &amp; earn</a>
+        <a href="/agent.exe">Download agent</a>
+        <a href="/host#faq">Host FAQ</a>
+        <a href="/status">Platform status</a>
+      </div>
+      <div class="foot-col">
+        <h3>Company</h3>
+        <a href="/terms">Terms of service</a>
+        <a href="/privacy">Privacy and DPDP</a>
+        <a href="/refund">Refund policy</a>
+        <a href="/refund#grievance">Grievance officer</a>
+        <a href="mailto:support@parkzone.in">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Copyright <span data-year>2026</span> ParkZone. All rights reserved.</span>
+      <span>Made in India - parkzone.in - single domain, always</span>
+    </div>
+  </div>
+</footer>
+<div class="toast-wrap" role="status" aria-live="polite"></div>
+</body>
+</html>

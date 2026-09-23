@@ -18,7 +18,7 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from threading import Lock
-from typing import Optional
+from typing import Literal, Optional
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -52,6 +52,7 @@ ALLOWED_IMAGES = [
 SSH_PORT_BASE = int(_env("PZ_SSH_PORT_BASE", "22001"))
 JUPYTER_PORT_BASE = int(_env("PZ_JUPYTER_PORT_BASE", "8901"))
 MIN_CREDIT_MINUTES = int(_env("PZ_MIN_CREDIT_MINUTES", "10"))
+HOST_TOKEN = _env("PZ_HOST_TOKEN", "")  # blank = open (dev); set it in production
 MARKUP = float(_env("PZ_MARKUP", "1.38"))
 LOG_LEVEL = _env("PZ_LOG_LEVEL", "INFO").upper()
 WALLET_MIN_PAISE = 500          # Rs 5
@@ -297,6 +298,29 @@ class StopReq(BaseModel):
         return _clean_email(v) if v else None
 
 
+class JobStatus(BaseModel):
+    """Host agent reports the outcome of provisioning a rental."""
+
+    host_id: str = Field(min_length=4, max_length=64)
+    instance_id: str = Field(min_length=8, max_length=64)
+    status: Literal["running", "failed"]
+    container_id: Optional[str] = Field(default=None, max_length=64)
+    detail: Optional[str] = Field(default=None, max_length=400)
+
+    @field_validator("host_id")
+    @classmethod
+    def _host(cls, v: str) -> str:
+        v = v.strip()
+        if not HOST_ID_RE.match(v):
+            raise ValueError("invalid host_id")
+        return v
+
+    @field_validator("detail")
+    @classmethod
+    def _detail(cls, v: Optional[str]) -> Optional[str]:
+        return _clean_text(v)[:400] if v else None
+
+
 class WalletAdd(BaseModel):
     email: str = Field(max_length=254)
     amount: int = Field(ge=WALLET_MIN_PAISE, le=WALLET_MAX_PAISE)
@@ -371,6 +395,18 @@ def _live_hosts() -> list:
             continue
         out.append(row)
     return out
+
+
+def require_host_token(x_host_token: Optional[str] = Header(default=None)) -> None:
+    """Host agents must present the shared token once PZ_HOST_TOKEN is set.
+
+    Without this, anyone could forge heartbeats, poison the marketplace with fake
+    GPUs, or claim another host's jobs. Blank token keeps local dev frictionless.
+    """
+    if not HOST_TOKEN:
+        return
+    if x_host_token != HOST_TOKEN:
+        raise HTTPException(status_code=401, detail="host token required")
 
 
 # --------------------------------------------------------------------------- #
@@ -449,7 +485,7 @@ def list_gpus(city: Optional[str] = None, min_vram: int = 0, max_price: Optional
     return rows
 
 
-@app.post("/api/heartbeat")
+@app.post("/api/heartbeat", dependencies=[Depends(require_host_token)])
 def heartbeat(hb: Heartbeat):
     """Host agent check-in. Upserts the host and refreshes the liveness TTL."""
     db = store.get_db()
@@ -478,7 +514,7 @@ def heartbeat(hb: Heartbeat):
     return {"status": "ok", "server_time": now.isoformat(), "host_ttl_seconds": store.HOST_TTL_SECONDS}
 
 
-@app.get("/api/jobs")
+@app.get("/api/jobs", dependencies=[Depends(require_host_token)])
 def poll_jobs(host_id: str):
     """Host agent polls for rentals it must provision. One-shot dispatch."""
     if not HOST_ID_RE.match((host_id or "").strip()):
@@ -711,3 +747,48 @@ def ledger(email: str, limit: int = 50):
         }
         for r in rows
     ]
+
+@app.post("/api/job-status", dependencies=[Depends(require_host_token)])
+def job_status(req: JobStatus):
+    """Close the provisioning loop: the agent tells us whether the container came up.
+
+    Without this an instance would sit in `starting` forever, which is both a bad
+    renter experience and a billing dispute waiting to happen.
+    """
+    from bson import ObjectId
+    from bson.errors import InvalidId
+
+    db = store.get_db()
+    try:
+        oid = ObjectId(req.instance_id)
+    except (InvalidId, TypeError):
+        raise HTTPException(404, "instance not found")
+    inst = db.instances.find_one({"_id": oid})
+    if not inst:
+        raise HTTPException(404, "instance not found")
+    if inst.get("host_id") != req.host_id:
+        raise HTTPException(403, "this instance does not belong to that host")
+    current = inst.get("status")
+    # Only provisioning/starting may move to running, and a repeat report must be a
+    # no-op: re-applying it would restart the billing clock from now() and silently
+    # undercharge the rental.
+    if current in {"running", "stopped", "failed"}:
+        return {"status": "ignored", "instance_status": current, "reason": "no transition required"}
+    now = store.now_utc()
+    update = {"$set": {"status": req.status, "reported_at": now}}
+    if req.container_id:
+        update["$set"]["docker_container_id"] = req.container_id
+    if req.detail:
+        update["$set"]["status_detail"] = req.detail
+    if req.status == "running":
+        update["$set"]["start_time"] = now  # bill from the moment the box was actually usable
+    db.instances.update_one({"_id": oid}, update)
+    store.record_txn(
+        inst["renter_email"],
+        "instance_" + req.status,
+        0,
+        instance_id=str(oid),
+        host_id=req.host_id,
+        note=(req.detail or "container started") if req.status == "failed" else "container running",
+    )
+    return {"status": req.status, "instance_status": req.status, "instance_id": str(oid)}

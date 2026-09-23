@@ -49,6 +49,9 @@ case "$SSH" in *" -p "*) PASS=$((PASS+1)); printf '  ok    %-50s %s\n' 'ssh hand
   *) FAIL=$((FAIL+1)); printf '  FAIL  %-50s got %s\n' 'ssh handle issued' "$SSH";; esac
 check 'POST /api/rent replay (idempotent)'  200 "$(hit -X POST "$BASE/api/rent" -H 'Content-Type: application/json' -d "{\"host_id\":\"$HOST_ID\",\"renter_email\":\"$EMAIL\",\"idempotency_key\":\"rent-$HOST_ID\"}")"
 check 'GET  /api/jobs (host dispatch)'     200 "$(hit "$BASE/api/jobs?host_id=$HOST_ID")"
+check 'POST /api/job-status running'          200 "$(hit -X POST "$BASE/api/job-status" -H 'Content-Type: application/json' -d "{\"host_id\":\"$HOST_ID\",\"instance_id\":\"$INSTANCE\",\"status\":\"running\",\"container_id\":\"smoke123\"}")"
+check 'POST /api/job-status repeat is no-op'  200 "$(hit -X POST "$BASE/api/job-status" -H 'Content-Type: application/json' -d "{\"host_id\":\"$HOST_ID\",\"instance_id\":\"$INSTANCE\",\"status\":\"running\"}")"
+check 'POST /api/job-status wrong host'       403 "$(hit -X POST "$BASE/api/job-status" -H 'Content-Type: application/json' -d "{\"host_id\":\"PC_NOTME99\",\"instance_id\":\"$INSTANCE\",\"status\":\"failed\"}")"
 check 'GET  /api/instances'                 200 "$(hit "$BASE/api/instances?email=$EMAIL")"
 
 echo "-- metering & teardown"

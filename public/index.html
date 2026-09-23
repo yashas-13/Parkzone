@@ -1,73 +1,680 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ParkZone - Indian GPUs for Indian AI | RTX 4090 at Rs 29/hr</title><script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--neon:#00FF88;--bg:#050807}
-*{font-family:'Inter',system-ui,sans-serif}
-.mono{font-family:'JetBrains Mono',monospace}
-body{background:var(--bg);color:#e8ece9;overflow-x:hidden}
-.bg-grid{background-image:linear-gradient(rgba(0,255,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.05) 1px,transparent 1px);background-size:44px 44px}
-.glow-orb{position:absolute;border-radius:9999px;filter:blur(110px);opacity:.25;pointer-events:none}
-.neon{color:var(--neon)}
-.grad-text{background:linear-gradient(92deg,#fff 20%,var(--neon) 60%,#7df9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.glass{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,136,.16);backdrop-filter:blur(14px)}
-.btn-neon{background:linear-gradient(135deg,#00FF88,#00cc6e);color:#03130b;font-weight:800;box-shadow:0 0 24px rgba(0,255,136,.35);transition:.25s}
-.btn-neon:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,255,136,.55)}
-.btn-ghost{border:1px solid rgba(0,255,136,.35);color:var(--neon);transition:.25s}
-.btn-ghost:hover{background:rgba(0,255,136,.1)}
-.gpu-card{transition:.3s;position:relative;overflow:hidden}
-.gpu-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,136,.14)}
-.live-dot{width:8px;height:8px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pl 1.6s infinite}
-@keyframes pl{50%{opacity:.4}}
-@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-.fade-up{animation:fu .7s cubic-bezier(.2,.7,.3,1) both}
-.uptime-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
-.uptime-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00cc6e,var(--neon))}
-.chip{font-size:11px;padding:2px 10px;border-radius:99px;border:1px solid rgba(0,255,136,.3);color:var(--neon);background:rgba(0,255,136,.07);cursor:pointer}
-.chip.on{background:rgba(0,255,136,.2)}
-input,select{background:#0a0f0c;border:1px solid rgba(0,255,136,.25);color:#e8ece9;border-radius:10px}
-input:focus,select:focus{outline:none;border-color:var(--neon)}
-#toast{position:fixed;bottom:24px;right:24px;z-index:99;display:flex;flex-direction:column;gap:8px}
-.toast{background:#0a120d;border:1px solid rgba(0,255,136,.4);border-radius:12px;padding:12px 18px;font-size:14px;animation:fu .3s}
-.modal-bg{background:rgba(0,0,0,.75)}
-.tick{animation:fu .5s both}
-.stat-num{font-size:1.6rem;font-weight:800}
-.faq-a{display:none}
-.faq.open .faq-a{display:block}
-.faq.open .faq-q span:last-child{transform:rotate(45deg)}
-</style></head><body><div class="fixed inset-0 bg-grid pointer-events-none"></div><div class="glow-orb" style="width:560px;height:560px;background:#00FF88;top:-200px;left:50%;transform:translateX(-50%)"></div><nav class="sticky top-0 z-50 border-b border-green-900" style="background:rgba(5,8,7,.85);backdrop-filter:blur(16px)"><div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between"><a href="/gpu/" class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl grid place-items-center font-black text-black text-lg" style="background:linear-gradient(135deg,#00FF88,#00b35c)">P</div><div class="text-xl font-extrabold">PARK<span class="neon">ZONE</span><span class="text-xs text-gray-500">.in/gpu</span></div></a><div class="hidden md:flex items-center gap-7 text-sm"><a href="/gpu/" class="neon font-semibold">Marketplace</a><a href="/gpu/host.html" class="text-gray-300 hover:text-white transition">Host & Earn</a><a href="/gpu/dashboard.html" class="text-gray-300 hover:text-white transition">Dashboard</a></div><div class="flex items-center gap-3"><div class="hidden sm:flex items-center gap-2 text-xs glass rounded-full px-3.5 py-1.5"><span class="live-dot"></span><span id="navCount" class="mono neon font-semibold">0 online</span></div><a href="/gpu/dashboard.html" class="btn-neon text-sm px-5 py-2 rounded-xl">Rent a GPU</a></div></div></nav>
-<header class="relative max-w-7xl mx-auto px-5 pt-16 pb-10 text-center">
-<div class="fade-up inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs mb-6"><span class="live-dot"></span><span class="text-gray-300">Live marketplace - <span id="heroCount" class="neon font-semibold">0 GPUs online</span> - updated <span id="upd" class="mono">-</span></span></div>
-<h1 class="fade-up font-black leading-tight" style="font-size:clamp(2.4rem,6vw,4rem);animation-delay:.08s">Indian GPUs for<br><span class="grad-text">Indian AI.</span></h1>
-<p class="fade-up mt-5 text-lg text-gray-400 max-w-2xl mx-auto" style="animation-delay:.16s">RTX 4090 from <span class="neon font-bold text-xl">Rs 29/hr</span> - <span class="text-white font-semibold">70% cheaper than AWS.</span> Idle gaming rigs, one-click PyTorch, per-minute billing.</p>
-<div class="fade-up mt-8 flex flex-wrap justify-center gap-3" style="animation-delay:.24s"><a href="#market" class="btn-neon px-7 py-3.5 rounded-2xl">Browse live GPUs</a><a href="/gpu/host.html" class="btn-ghost px-7 py-3.5 rounded-2xl font-semibold">Park your GPU, earn Rs 5k/mo</a></div>
-<div class="fade-up mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto text-left" style="animation-delay:.32s">
-<div class="glass rounded-2xl p-4"><div class="stat-num neon mono" id="statGpus">-</div><div class="text-xs text-gray-500 mt-1">GPUs online now</div></div>
-<div class="glass rounded-2xl p-4"><div class="stat-num mono">Rs 29</div><div class="text-xs text-gray-500 mt-1">4090/hr, vs Rs 98 AWS</div></div>
-<div class="glass rounded-2xl p-4"><div class="stat-num mono">70%</div><div class="text-xs text-gray-500 mt-1">cheaper than cloud</div></div>
-<div class="glass rounded-2xl p-4"><div class="stat-num mono">60s</div><div class="text-xs text-gray-500 mt-1">per-minute billing</div></div>
-</div></header>
-<main id="market" class="relative max-w-7xl mx-auto px-5 pb-24">
-<div class="flex flex-wrap items-end justify-between gap-3 mb-4"><div><h2 class="text-2xl font-extrabold">Live marketplace</h2><p class="text-sm text-gray-500 mt-1">Auto-refreshes every 10s, prices include ParkZone fee</p></div>
-<div class="flex flex-wrap gap-2 items-center"><input id="q" placeholder="Search GPU / city" class="text-sm px-4 py-2 w-52"><select id="sort" class="text-sm px-3 py-2"><option value="price">Sort: price low-high</option><option value="vram">Sort: VRAM high-low</option><option value="uptime">Sort: uptime</option></select><select id="city" class="text-sm px-3 py-2"><option value="">All cities</option></select></div></div>
-<div class="flex gap-2 flex-wrap mb-4"><button data-chip="all" class="chip fchip on">All GPUs</button><button data-chip="4090" class="chip fchip">RTX 4090</button><button data-chip="4080" class="chip fchip">RTX 4080</button><button data-chip="3090" class="chip fchip">RTX 3090</button><button data-chip="3060" class="chip fchip">RTX 3060</button><button data-chip="A100" class="chip fchip">A100 / H100</button></div>
-<div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-<div class="text-center mt-10 text-sm text-gray-500">Own a gaming PC? <a href="/gpu/host.html" class="neon font-semibold">List it in 2 minutes</a></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ParkZone - Rent Indian GPUs by the minute | RTX 4090 from Rs 29/hr</title>
+<meta name="description" content="ParkZone is India's GPU marketplace: rent an RTX 4090, 3090 or A100 by the minute from hosts across Mumbai, Delhi, Bengaluru and more. Up to 70% cheaper than AWS. Pay in INR via UPI. Park your idle gaming GPU and earn monthly.">
+<meta name="theme-color" content="#05070a">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="pz-api-base" content="/api">
+<meta name="pz-poll-ms" content="8000">
+<link rel="canonical" href="https://parkzone.in/">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ParkZone">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="ParkZone - Rent Indian GPUs by the minute">
+<meta property="og:description" content="RTX 4090 from Rs 29/hr, billed per minute, paid in INR. India's GPU parking marketplace.">
+<meta property="og:url" content="https://parkzone.in/">
+<meta property="og:image" content="https://parkzone.in/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ParkZone - Indian GPUs for Indian AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ParkZone - Rent Indian GPUs by the minute">
+<meta name="twitter:description" content="RTX 4090 from Rs 29/hr. Per-minute billing, INR, made in India.">
+<meta name="twitter:image" content="https://parkzone.in/assets/og.png">
+
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/favicon.svg">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/pz.css">
+<script src="/assets/pz.js" defer></script>
+<script src="/assets/page-home.js" defer></script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://parkzone.in/#org",
+      "name": "ParkZone",
+      "url": "https://parkzone.in/",
+      "logo": "https://parkzone.in/assets/favicon.svg",
+      "areaServed": { "@type": "Country", "name": "India" },
+      "contactPoint": { "@type": "ContactPoint", "email": "support@parkzone.in", "contactType": "customer support" }
+    },
+    {
+      "@type": "Product",
+      "name": "ParkZone GPU rental",
+      "description": "On-demand NVIDIA GPU rental in India, billed per minute.",
+      "brand": { "@id": "https://parkzone.in/#org" },
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "INR",
+        "lowPrice": "9",
+        "highPrice": "250",
+        "offerCount": "50",
+        "availability": "https://schema.org/InStock",
+        "url": "https://parkzone.in/"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "How is billing calculated?", "acceptedAnswer": { "@type": "Answer", "text": "Per started minute, from your wallet, at the GPU's listed hourly rate divided by 60. Stopping an instance ends billing immediately." } },
+        { "@type": "Question", "name": "Which GPUs can I rent?", "acceptedAnswer": { "@type": "Answer", "text": "Whatever Indian hosts have parked right now - typically RTX 3060 through RTX 4090, plus A100 and H100 datacenter cards." } },
+        { "@type": "Question", "name": "How do hosts get paid?", "acceptedAnswer": { "@type": "Answer", "text": "Hosts keep 100% of the hourly price they set. Payouts go out weekly over UPI with a Rs 500 minimum." } }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<div class="decor" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+</div>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>
+        <span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span>
+        <span class="sr-only">home</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/" aria-current="page">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="badge badge-live nowrap"><span class="dot"></span><span id="navCount">loading</span></span>
+      <a class="btn btn-primary btn-sm" href="#market">Rent a GPU</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navDrawer" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="container">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+      <a class="btn btn-primary btn-block mt-4" href="#market">Rent a GPU</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+
+  <!-- ============================================================ HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-badge reveal"><span class="dot"></span><span>Live marketplace - <b class="neon" id="heroGpuCount">connecting</b> - updated <span class="mono" id="heroUpdated">-</span></span></p>
+      <h1 class="h1 mt-5 reveal grad">Indian GPUs for Indian&nbsp;AI.</h1>
+      <p class="lead mt-5 reveal">Rent an RTX 4090 for <b class="neon">Rs 29/hr</b> instead of Rs 98/hr on AWS. Idle gaming rigs across India, one-click PyTorch, billed per minute, paid in rupees. Or park your own GPU and earn every month.</p>
+      <div class="btn-row mt-6 reveal">
+        <a class="btn btn-primary btn-lg" href="#market">Browse live GPUs</a>
+        <a class="btn btn-ghost btn-lg" href="/host">Park your GPU, earn Rs 5,000/mo</a>
+      </div>
+      <div class="row mt-5 reveal tiny faint">
+        <span>No contracts</span><span aria-hidden="true">-</span>
+        <span>No sales calls</span><span aria-hidden="true">-</span>
+        <span>Cancel any minute</span><span aria-hidden="true">-</span>
+        <span>UPI and cards in INR</span>
+      </div>
+
+      <div class="hero-stats" id="heroStats">
+        <div class="stat-tile reveal">
+          <div class="stat">
+            <span class="stat-num neon" id="statGpus" data-count="0">0</span>
+            <span class="stat-label">GPUs online now</span>
+          </div>
+        </div>
+        <div class="stat-tile reveal">
+          <div class="stat">
+            <span class="stat-num" id="statLow">-</span>
+            <span class="stat-label">cheapest live price /hr</span>
+          </div>
+        </div>
+        <div class="stat-tile reveal">
+          <div class="stat">
+            <span class="stat-num" id="statCities">0</span>
+            <span class="stat-label">Indian cities hosting</span>
+          </div>
+        </div>
+        <div class="stat-tile reveal">
+          <div class="stat">
+            <span class="stat-num">60s</span>
+            <span class="stat-label">billing granularity</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticker mt-6" aria-label="Live GPU prices">
+        <div class="ticker-track" id="tickerTrack">
+          <span class="ticker-item">Fetching live prices<span class="caret"></span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== MARKETPLACE -->
+  <section class="section" id="market">
+    <div class="container">
+      <div class="section-head row-between">
+        <div>
+          <p class="eyebrow">Live inventory</p>
+          <h2 class="h2 mt-2">Every GPU below is a real machine, online right now.</h2>
+          <p class="lead mt-3">Heartbeats every 30 seconds. Prices include the ParkZone fee and refresh automatically - no quotes, no waiting for a human.</p>
+        </div>
+        <p class="tiny faint mono nowrap">auto-refresh <span id="refreshCount">8</span>s</p>
+      </div>
+
+      <div class="card card-pad mb-5">
+        <div class="form-row">
+          <div class="field">
+            <label class="label" for="q">Search</label>
+            <input class="input" id="q" type="search" placeholder="RTX 4090, Mumbai, 24 GB" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="label" for="city">City</label>
+            <select class="select" id="city"><option value="">All cities</option></select>
+          </div>
+          <div class="field">
+            <label class="label" for="sort">Sort by</label>
+            <select class="select" id="sort">
+              <option value="price">Price: low to high</option>
+              <option value="vram">VRAM: high to low</option>
+              <option value="uptime">Uptime: best first</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="minvram">Min VRAM</label>
+            <select class="select" id="minvram">
+              <option value="0">Any</option>
+              <option value="8192">8 GB+</option>
+              <option value="12288">12 GB+</option>
+              <option value="16384">16 GB+</option>
+              <option value="24576">24 GB+</option>
+            </select>
+          </div>
+        </div>
+        <div class="chips mt-4" id="gpuChips">
+          <button class="chip" type="button" data-chip="all" aria-pressed="true">All GPUs</button>
+          <button class="chip" type="button" data-chip="4090" aria-pressed="false">RTX 4090</button>
+          <button class="chip" type="button" data-chip="3090" aria-pressed="false">RTX 3090</button>
+          <button class="chip" type="button" data-chip="4080" aria-pressed="false">RTX 4080</button>
+          <button class="chip" type="button" data-chip="3060" aria-pressed="false">RTX 3060</button>
+          <button class="chip" type="button" data-chip="A100" aria-pressed="false">A100 / H100</button>
+        </div>
+      </div>
+
+      <div class="grid" id="marketGrid" aria-live="polite" aria-busy="true"></div>
+      <p class="center mt-6 muted small">Own a gaming PC? <a class="neon bold" href="/host">List it in two minutes</a> - you keep 100% of the price you set.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================== HOW IT WORKS -->
+  <section class="section section-tight" id="how">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">From zero to training</p>
+        <h2 class="h2 mt-2">Online in under five minutes.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <b>Add credit</b>
+          <p>Top up from Rs 5 with UPI, cards or netbanking. Money sits in your wallet and is only consumed while an instance runs.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">2</div>
+          <b>Pick a GPU</b>
+          <p>Filter the live inventory by card, city, VRAM and price. Every listing shows its real uptime over the last 30 days.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">3</div>
+          <b>Deploy</b>
+          <p>Choose a container image and get SSH plus Jupyter endpoints in seconds. Billing ticks per minute; stop whenever you like.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================== API -->
+  <section class="section" id="api">
+    <div class="container">
+      <div class="split">
+        <div>
+          <p class="eyebrow">API first</p>
+          <h2 class="h2 mt-2">If it is in the console, it is in the API.</h2>
+          <p class="lead mt-3">Every listing, price, rental and stop action is a documented JSON endpoint on this same domain. Script it, batch it, or let an agent drive it - no hidden console-only features, no sales call, no minimum spend.</p>
+          <div class="kv mt-5 card card-pad">
+            <div class="kv-row"><span>Base URL</span><span>https://parkzone.in/api</span></div>
+            <div class="kv-row"><span>Auth</span><span>email + wallet (API keys next)</span></div>
+            <div class="kv-row"><span>Rate limit</span><span>20 req/s burst, 3 req/s on writes</span></div>
+            <div class="kv-row"><span>Reference</span><span><a class="neon" href="/api/docs">/api/docs</a></span></div>
+          </div>
+        </div>
+        <div class="term" data-tabs>
+          <div class="term-bar">
+            <span class="term-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <div class="term-tabs" role="tablist" aria-label="API examples">
+              <button class="term-tab" role="tab" id="tab-curl" aria-controls="panel-curl" aria-selected="true" type="button">cURL</button>
+              <button class="term-tab" role="tab" id="tab-py" aria-controls="panel-py" aria-selected="false" type="button">Python</button>
+              <button class="term-tab" role="tab" id="tab-cli" aria-controls="panel-cli" aria-selected="false" type="button">Agent</button>
+            </div>
+            <button class="copy-btn" type="button" data-copy="curl -s https://parkzone.in/api/gpus">Copy</button>
+          </div>
+          <div class="term-body">
+            <pre class="term-panel" id="panel-curl" role="tabpanel" aria-labelledby="tab-curl"><code><span class="term-line p-cmt"># what is online right now</span><span class="term-line"><span class="p-cmd">curl</span> -s https://parkzone.in/api/gpus | <span class="p-cmd">jq</span> <span class="p-str">'.[0]'</span></span><span class="term-line p-key">{</span><span class="term-line">  <span class="p-str">"gpu_model"</span>: <span class="p-str">"NVIDIA GeForce RTX 4090"</span>,</span><span class="term-line">  <span class="p-str">"vram"</span>: <span class="p-flag">24564</span>, <span class="p-str">"city"</span>: <span class="p-str">"Mumbai"</span>,</span><span class="term-line">  <span class="p-str">"display_price"</span>: <span class="p-flag">29</span>, <span class="p-str">"uptime"</span>: <span class="p-flag">99.8</span></span><span class="term-line p-key">}</span></code></pre>
+            <pre class="term-panel" id="panel-py" role="tabpanel" aria-labelledby="tab-py" hidden><code><span class="term-line p-cmt"># pip install requests</span><span class="term-line"><span class="p-key">import</span> requests</span><span class="term-line"> </span><span class="term-line">API = <span class="p-str">"https://parkzone.in/api"</span></span><span class="term-line">gpu = requests.get(<span class="p-str">f"{API}/gpus"</span>).json()[<span class="p-flag">0</span>]</span><span class="term-line">r = requests.post(<span class="p-str">f"{API}/rent"</span>, json=<span class="p-key">{</span></span><span class="term-line">    <span class="p-str">"host_id"</span>: gpu[<span class="p-str">"host_id"</span>],</span><span class="term-line">    <span class="p-str">"renter_email"</span>: <span class="p-str">"you@example.in"</span>,</span><span class="term-line">    <span class="p-str">"docker_image"</span>: <span class="p-str">"pytorch/pytorch"</span>,</span><span class="term-line"><span class="p-key">}</span>).json()</span><span class="term-line"><span class="p-cmd">print</span>(r[<span class="p-str">"ssh"</span>])  <span class="p-cmt"># ssh root@parkzone.in -p 22001</span></span></code></pre>
+            <pre class="term-panel" id="panel-cli" role="tabpanel" aria-labelledby="tab-cli" hidden><code><span class="term-line p-cmt"># on the Windows PC you want to rent out</span><span class="term-line"><span class="p-cmd">powershell</span> -c <span class="p-str">"iwr parkzone.in/agent.exe -OutFile agent.exe"</span></span><span class="term-line"><span class="p-cmd">.\agent.exe</span></span><span class="term-line"> </span><span class="term-line p-cmt"># ParkZone Host Agent v2.0</span><span class="term-line">GPU   NVIDIA GeForce RTX 4090 - 24564 MB</span><span class="term-line">City  Mumbai   Price  Rs 21/hr (you keep all of it)</span><span class="term-line">Host  PC_8F3A21C4 - heartbeat <span class="p-flag">200</span> ok every 30s <span class="caret"></span></span></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= NETWORK -->
+  <section class="section" id="network">
+    <div class="container">
+      <div class="split">
+        <div class="map-wrap reveal">
+          <h3 class="h3">Where the GPUs are</h3>
+          <p class="small muted mt-2">Click a city to filter the marketplace. Latency below 40 ms from anywhere in India.</p>
+          <svg class="map-svg mt-4" viewBox="0 0 520 560" role="img" aria-label="Map of ParkZone GPU host locations across India">
+            <g aria-hidden="true">
+              <line x1="50" y1="0" x2="50" y2="560" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="218" y1="0" x2="218" y2="560" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="386" y1="0" x2="386" y2="560" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="470" y1="0" x2="470" y2="560" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="0" y1="131" x2="520" y2="131" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="0" y1="224" x2="520" y2="224" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="0" y1="317" x2="520" y2="317" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="0" y1="411" x2="520" y2="411" stroke="#ffffff" stroke-opacity="0.04"/>
+              <line x1="0" y1="504" x2="520" y2="504" stroke="#ffffff" stroke-opacity="0.04"/>
+            </g>
+            <g aria-hidden="true" stroke="#00ff88" stroke-opacity="0.18">
+              <line x1="98" y1="334" x2="171" y2="157"/>
+              <line x1="98" y1="334" x2="178" y2="448"/>
+              <line x1="98" y1="334" x2="193" y2="366"/>
+              <line x1="98" y1="334" x2="223" y2="446"/>
+              <line x1="98" y1="334" x2="358" y2="269"/>
+              <line x1="98" y1="334" x2="94" y2="261"/>
+              <line x1="98" y1="334" x2="147" y2="188"/>
+              <line x1="98" y1="334" x2="156" y2="505"/>
+              <line x1="171" y1="157" x2="147" y2="188"/>
+              <line x1="178" y1="448" x2="223" y2="446"/>
+              <line x1="178" y1="448" x2="193" y2="366"/>
+            </g>
+            <g data-city-node="Mumbai" tabindex="0" role="button" aria-label="Filter marketplace by Mumbai">
+              <circle class="map-node-halo" cx="99" cy="335" r="22"/>
+              <circle class="map-node" cx="99" cy="335" r="8"/>
+              <text x="115" y="339" fill="#eef2f0" font-size="17" font-family="Inter,sans-serif" font-weight="700">Mumbai</text>
+              <text x="115" y="357" fill="#6d7a75" font-size="13" font-family="JetBrains Mono,monospace" data-city-count="Mumbai">-</text>
+            </g>
+            <g data-city-node="Delhi NCR" tabindex="0" role="button" aria-label="Filter marketplace by Delhi NCR">
+              <circle class="map-node-halo" cx="171" cy="157" r="18"/>
+              <circle class="map-node" cx="171" cy="157" r="7"/>
+              <text x="187" y="161" fill="#eef2f0" font-size="16" font-family="Inter,sans-serif" font-weight="700">Delhi NCR</text>
+              <text x="187" y="179" fill="#6d7a75" font-size="13" font-family="JetBrains Mono,monospace" data-city-count="Delhi NCR">-</text>
+            </g>
+            <g data-city-node="Bengaluru" tabindex="0" role="button" aria-label="Filter marketplace by Bengaluru">
+              <circle class="map-node-halo" cx="178" cy="449" r="18"/>
+              <circle class="map-node" cx="178" cy="449" r="7"/>
+              <text x="194" y="453" fill="#eef2f0" font-size="16" font-family="Inter,sans-serif" font-weight="700">Bengaluru</text>
+              <text x="194" y="471" fill="#6d7a75" font-size="13" font-family="JetBrains Mono,monospace" data-city-count="Bengaluru">-</text>
+            </g>
+            <g data-city-node="Hyderabad" tabindex="0" role="button" aria-label="Filter marketplace by Hyderabad">
+              <circle class="map-node" cx="193" cy="366" r="6"/>
+              <text x="205" y="370" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Hyderabad</text>
+            </g>
+            <g data-city-node="Chennai" tabindex="0" role="button" aria-label="Filter marketplace by Chennai">
+              <circle class="map-node" cx="223" cy="447" r="6"/>
+              <text x="235" y="451" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Chennai</text>
+            </g>
+            <g data-city-node="Kolkata" tabindex="0" role="button" aria-label="Filter marketplace by Kolkata">
+              <circle class="map-node" cx="358" cy="269" r="6"/>
+              <text x="322" y="252" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Kolkata</text>
+            </g>
+            <g data-city-node="Pune" tabindex="0" role="button" aria-label="Filter marketplace by Pune">
+              <circle class="map-node" cx="115" cy="345" r="5"/>
+              <text x="124" y="376" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Pune</text>
+            </g>
+            <g data-city-node="Ahmedabad" tabindex="0" role="button" aria-label="Filter marketplace by Ahmedabad">
+              <circle class="map-node" cx="94" cy="261" r="5"/>
+              <text x="104" y="266" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Ahmedabad</text>
+            </g>
+            <g data-city-node="Jaipur" tabindex="0" role="button" aria-label="Filter marketplace by Jaipur">
+              <circle class="map-node" cx="147" cy="188" r="5"/>
+              <text x="157" y="193" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Jaipur</text>
+            </g>
+            <g data-city-node="Kochi" tabindex="0" role="button" aria-label="Filter marketplace by Kochi">
+              <circle class="map-node" cx="156" cy="505" r="5"/>
+              <text x="167" y="510" fill="#a7b3ae" font-size="15" font-family="Inter,sans-serif">Kochi</text>
+            </g>
+          </svg>
+          <div class="legend">
+            <span><i class="dot"></i>live hosts</span>
+            <span><i class="dot dot-off"></i>no host yet - park yours</span>
+          </div>
+        </div>
+
+        <div>
+          <p class="eyebrow">Made for India</p>
+          <h2 class="h2 mt-2">Your data never leaves the country.</h2>
+          <p class="lead mt-3">Every host runs inside India, so training data, model weights and customer PII stay under Indian jurisdiction. You get GST invoices, UPI payments and rupee pricing instead of a dollar card charge and a 3-day support thread.</p>
+          <div class="grid-2 mt-5">
+            <div class="card card-pad">
+              <b class="block">Under 40 ms</b>
+              <p class="small muted mt-2">Interactive notebooks and small-batch inference feel local, because they are.</p>
+            </div>
+            <div class="card card-pad">
+              <b class="block">GST compliant</b>
+              <p class="small muted mt-2">Proper invoices for company reimbursement and input credit.</p>
+            </div>
+            <div class="card card-pad">
+              <b class="block">UPI and cards</b>
+              <p class="small muted mt-2">No forex markup, no 3% international card fee.</p>
+            </div>
+            <div class="card card-pad">
+              <b class="block">DPDP-aligned</b>
+              <p class="small muted mt-2">Data-processing terms, deletion on request, grievance officer listed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== PRICING -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Honest comparison</p>
+        <h2 class="h2 mt-2">The same GPU, at Indian prices.</h2>
+        <p class="lead mt-3">Indicative list rates for an RTX 4090-class instance, checked against public cloud pricing pages. ParkZone's live price is whatever the cheapest online host is charging right now.</p>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="table">
+          <caption class="sr-only">Comparison of GPU rental platforms for Indian customers</caption>
+          <thead>
+            <tr><th scope="col">Platform</th><th scope="col">4090-class /hr</th><th scope="col">Billing</th><th scope="col">Pay in</th><th scope="col">Data residency</th><th scope="col">Minimum spend</th></tr>
+          </thead>
+          <tbody>
+            <tr class="is-us"><th scope="row">ParkZone</th><td class="mono neon">Rs 29</td><td>per started minute</td><td>INR - UPI, cards, netbanking, GST invoice</td><td>India only</td><td>Rs 5 wallet top-up</td></tr>
+            <tr><th scope="row">AWS (g5/p4d class)</th><td class="mono">about Rs 98</td><td>per second, 1 min minimum</td><td>USD card, forex markup</td><td>US, EU, ap-south-1 Mumbai</td><td>account + card on file</td></tr>
+            <tr><th scope="row">Google Cloud (L4/A100)</th><td class="mono">about Rs 105</td><td>per second, 1 min minimum</td><td>USD card</td><td>US, EU, asia-south1</td><td>quota request</td></tr>
+            <tr><th scope="row">Azure (NC-series)</th><td class="mono">about Rs 112</td><td>per second</td><td>USD card</td><td>US, EU, Central India</td><td>subscription + quota</td></tr>
+            <tr><th scope="row">Peer GPU marketplaces</th><td class="mono">Rs 22 - 40</td><td>per second</td><td>USD card, crypto</td><td>mostly US/EU hosts</td><td>USD 5 minimum</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tiny faint mt-3">Competitor figures are indicative and rounded, used for orientation only. ParkZone prices come from the live marketplace above and change with host supply.</p>
+    </div>
+  </section>
+
+  <!-- ======================================================= CONTAINERS -->
+  <section class="section" id="images">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Ready to run</p>
+        <h2 class="h2 mt-2">Pre-approved containers, zero setup.</h2>
+        <p class="lead mt-3">Pick one of these images and you get a CUDA-ready box with Python, pip and the usual toolchain already installed. Renter code runs inside the container only - it never touches the host's own system.</p>
+      </div>
+      <div class="grid-3" id="imageGrid">
+        <div class="card card-pad card-hover reveal">
+          <div class="card-head"><b>PyTorch + CUDA</b><span class="badge badge-flagship">most used</span></div>
+          <p class="small muted mt-3">Official PyTorch image with CUDA runtime. Fine-tuning, LoRA, diffusion, anything torch.</p>
+          <p class="tiny faint mono mt-3">pytorch/pytorch</p>
+          <button class="btn btn-primary btn-block mt-4" type="button" data-deploy="pytorch/pytorch">Deploy PyTorch</button>
+        </div>
+        <div class="card card-pad card-hover reveal">
+          <div class="card-head"><b>TensorFlow GPU</b><span class="badge badge-highend">Keras ready</span></div>
+          <p class="small muted mt-3">TensorFlow with GPU support and Jupyter baked in. Good for classic CV and TF Serving work.</p>
+          <p class="tiny faint mono mt-3">tensorflow/tensorflow:latest-gpu</p>
+          <button class="btn btn-ghost btn-block mt-4" type="button" data-deploy="tensorflow/tensorflow:latest-gpu">Deploy TensorFlow</button>
+        </div>
+        <div class="card card-pad card-hover reveal">
+          <div class="card-head"><b>CUDA base</b><span class="badge badge-budget">BYO stack</span></div>
+          <p class="small muted mt-3">Bare Ubuntu 22.04 with the CUDA toolkit. Bring your own conda env, Rust build or llama.cpp.</p>
+          <p class="tiny faint mono mt-3">nvidia/cuda:12.1.0-base-ubuntu22.04</p>
+          <button class="btn btn-ghost btn-block mt-4" type="button" data-deploy="nvidia/cuda:12.1.0-base-ubuntu22.04">Deploy CUDA base</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================== CALCULATOR -->
+  <section class="section" id="savings">
+    <div class="container">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Savings calculator</p>
+          <h2 class="h2 mt-2">Work out your month before you spend a rupee.</h2>
+          <p class="lead mt-3">Move the sliders. Nothing here is locked in - ParkZone has no monthly plan, so a quiet week costs you nothing.</p>
+          <div class="card card-pad card-brand mt-5">
+            <div class="calc">
+              <div class="field">
+                <label class="label" for="calcRate">GPU rate per hour - <span class="mono neon" id="calcRateOut">Rs 29</span></label>
+                <input id="calcRate" type="range" min="9" max="150" step="1" value="29">
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label class="label" for="calcHours">Hours per day - <span class="mono neon" id="calcHoursOut">4h</span></label>
+                  <input id="calcHours" type="range" min="1" max="24" step="1" value="4">
+                </div>
+                <div class="field">
+                  <label class="label" for="calcDays">Days per month - <span class="mono neon" id="calcDaysOut">20</span></label>
+                  <input id="calcDays" type="range" min="1" max="30" step="1" value="20">
+                </div>
+              </div>
+              <hr>
+              <div class="calc-out">
+                <div>
+                  <div class="stat-label">You pay ParkZone</div>
+                  <div class="calc-big" id="calcCost">Rs 2,320</div>
+                </div>
+                <div>
+                  <div class="stat-label">Same hours on AWS</div>
+                  <div class="calc-side muted" id="calcAws">Rs 7,840</div>
+                </div>
+                <div>
+                  <div class="stat-label">You save</div>
+                  <div class="calc-side neon" id="calcSave">70%</div>
+                </div>
+              </div>
+              <p class="tiny faint">Comparison uses Rs 98/hr, the indicative AWS rate for a 4090-class instance. ParkZone bills per started minute.</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card card-pad card-hover reveal">
+            <p class="eyebrow">Host &amp; earn</p>
+            <h3 class="h3 mt-2">Your GPU earns Rs 5,000/mo while you sleep.</h3>
+            <p class="small muted mt-3">Set your own hourly price and keep 100% of it. ParkZone adds its fee on top for the renter, runs renters inside Docker, and pays you weekly over UPI.</p>
+            <div class="kv mt-4">
+              <div class="kv-row"><span>You set</span><span class="neon">Rs 21/hr</span></div>
+              <div class="kv-row"><span>Renter sees</span><span>Rs 29/hr</span></div>
+              <div class="kv-row"><span>Your 200-hour month</span><span class="neon">Rs 4,200</span></div>
+              <div class="kv-row"><span>Payout</span><span>Weekly UPI, Rs 500 min</span></div>
+            </div>
+            <a class="btn btn-primary btn-block mt-5" href="/host">Download the host agent</a>
+            <p class="tiny faint mt-2">Windows 10/11 - NVIDIA GPU - Docker Desktop with WSL2</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== TRUST -->
+  <section class="section section-tight" id="trust">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Why people park here</p>
+        <h2 class="h2 mt-2">Built by people who got tired of dollar bills.</h2>
+      </div>
+      <div class="grid-3">
+        <div class="quote reveal">
+          <p class="quote-text">"We were paying Rs 40,000 a month for a fraction of a rented A100. Moving our fine-tuning to ParkZone cut that to about Rs 12,000 and the invoices are finally usable for input credit."</p>
+          <div class="quote-by"><span class="avatar" aria-hidden="true">RK</span><span>Rohit K. - ML lead, fintech startup, Bengaluru</span></div>
+        </div>
+        <div class="quote reveal">
+          <p class="quote-text">"My 3080 sat idle every night after gaming. I parked it during sleeping hours and it has been covering my electricity bill and then some, paid to my UPI every Monday."</p>
+          <div class="quote-by"><span class="avatar" aria-hidden="true">AS</span><span>Aditya S. - host, Pune</span></div>
+        </div>
+        <div class="quote reveal">
+          <p class="quote-text">"Per-minute billing sounds like a small thing until you are iterating on a research idea at 2am. We spin up, experiment, stop. The wallet does not bleed."</p>
+          <div class="quote-by"><span class="avatar" aria-hidden="true">MV</span><span>Meera V. - PhD researcher, IIT Delhi</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ FAQ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="split">
+        <div>
+          <p class="eyebrow">Questions</p>
+          <h2 class="h2 mt-2">Everything you would ask on a sales call.</h2>
+          <p class="lead mt-3">Only this is faster. Still stuck? Mail <a class="neon" href="mailto:support@parkzone.in">support@parkzone.in</a> and a human answers, usually the same day.</p>
+        </div>
+        <div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">How exactly is billing calculated?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Per started minute. A GPU listed at Rs 29/hr costs 49 paise per minute, taken from your wallet. Stop the instance and billing stops immediately - there is no minimum hour and no idle charge.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Which GPUs are available?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Whatever Indian hosts have parked right now, which is usually RTX 3060 through RTX 4090 and occasionally A100 or H100 datacenter cards. The marketplace above is the live truth, refreshed every few seconds.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Is my data safe?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Renter workloads run inside a Docker container on the host with CPU, memory and process limits - never on the host's own operating system. Hosts can kill a job instantly, and every host location is inside India. Read the <a class="neon" href="/privacy">privacy note</a> for how we handle account data.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">What does hosting cost me?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Nothing. No signup fee, no listing fee, no exclusivity. You set the hourly price, keep 100% of it, and ParkZone adds its fee on top for the renter. Payouts are weekly over UPI with a Rs 500 minimum.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">What do I need to host?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Windows 10 or 11, an NVIDIA GPU with 6 GB or more VRAM, Docker Desktop with WSL2, and a 20 Mbps upload connection. Download the agent, enter your email, city and price - it appears on the marketplace within 30 seconds.</p></div></div>
+          </div>
+          <div class="faq">
+            <button class="faq-q" type="button" aria-expanded="false">Can I get a refund?<i aria-hidden="true">+</i></button>
+            <div class="faq-a"><div><p>Unused wallet balance is refundable to the original payment method. If an instance never came up, the credit is returned automatically. The full terms are on the <a class="neon" href="/refund">refund policy</a> page.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== CLOSING -->
+  <section class="section section-tight">
+    <div class="container">
+      <div class="card card-pad card-brand center reveal">
+        <h2 class="h2">Start with Rs 5. Scale to as many GPUs as India has.</h2>
+        <p class="lead mt-3">No contracts, no minimums, no sales calls. Top up, rent, stop - the API does the rest.</p>
+        <div class="btn-row mt-5 center">
+          <a class="btn btn-primary btn-lg" href="#market">Rent a GPU now</a>
+          <a class="btn btn-quiet btn-lg" href="/host">Earn from your GPU</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
-<div id="modal" class="hidden fixed inset-0 z-50 modal-bg grid place-items-center p-4" style="background:rgba(0,0,0,.75)"><div class="glass rounded-3xl max-w-md w-full p-7" style="background:#0a120d"><h3 class="text-xl font-extrabold">Rent <span id="mGpu" class="neon"></span></h3><p class="text-sm text-gray-400 mt-1 mono" id="mMeta"></p><label class="text-xs text-gray-400 block mt-4 mb-1">Your email</label><input id="mEmail" type="email" placeholder="you@example.in" class="w-full text-sm px-4 py-2.5"><label class="text-xs text-gray-400 block mt-3 mb-1">Docker image</label><select id="mImg" class="w-full text-sm px-3 py-2.5"><option>pytorch/pytorch</option><option>tensorflow/tensorflow:latest-gpu</option><option>nvidia/cuda:12.1.0-base-ubuntu22.04</option></select><div class="flex gap-2 mt-5"><button onclick="confirmRent()" class="btn-neon flex-1 py-3 rounded-xl text-sm">Confirm rent</button><button onclick="closeModal()" class="btn-ghost px-5 py-3 rounded-xl text-sm">Cancel</button></div><p class="text-xs text-gray-600 mt-3">Per-minute billing from wallet, SSH + Jupyter issued instantly</p></div></div>
-<footer class="border-t border-green-900 py-8 text-center text-xs text-gray-600">PARK<span class="neon">ZONE</span>.in/gpu - Vast.ai-grade power, desi prices - <a class="hover:text-gray-300" href="/gpu/host.html">Host</a> - <a class="hover:text-gray-300" href="/gpu/dashboard.html">Dashboard</a></footer><div id="toast"></div><script>
-var API='/gpu/api',ALL=[],CHIP='all';
-function $(id){return document.getElementById(id)}
-function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;$('toast').appendChild(t);setTimeout(function(){t.remove()},3200)}
-function tier(n){if(/4090/i.test(n))return 'FLAGSHIP';if(/4080|3090/i.test(n))return 'HIGH-END';if(/A100|H100/i.test(n))return 'DATACENTER';return 'BUDGET'}
-function gb(v){return v>=1024?(v/1024).toFixed(v%1024?1:0)+' GB':v+' MB'}
-function card(x){var u=Math.round(x.uptime||100);
-return '<div class="gpu-card glass rounded-3xl p-5 tick"><div class="flex items-start justify-between"><span class="chip">'+tier(x.gpu_model)+'</span><span class="flex items-center gap-1.5 text-xs text-gray-400"><span class="live-dot" style="width:6px;height:6px"></span>ONLINE</span></div><h3 class="text-lg font-extrabold mt-3">'+x.gpu_model+'</h3><p class="text-xs text-gray-500 mono mt-0.5">'+gb(x.vram)+' VRAM | '+x.city+' | '+x.host_id+'</p><div class="flex items-end gap-2 mt-4"><span class="text-3xl font-black neon mono">Rs '+x.display_price+'</span><span class="text-xs text-gray-500 mb-1.5">/hr</span></div><div class="mt-2 flex justify-between text-xs text-gray-500"><span>Uptime</span><span class="mono neon">'+u+'%</span></div><div class="uptime-bar mt-1"><div class="uptime-fill" style="width:'+u+'%"></div></div><button data-host="'+x.host_id+'" data-gpu="'+x.gpu_model+'" class="rentbtn btn-neon w-full mt-4 py-3 rounded-xl text-sm">Rent now</button></div>'}
-function render(){var q=$('q').value.toLowerCase(),cv=$('city').value;var l=ALL.filter(function(x){return (CHIP==='all'||x.gpu_model.toLowerCase().indexOf(CHIP.toLowerCase())>=0)&&(!q||(x.gpu_model+' '+x.city).toLowerCase().indexOf(q)>=0)&&(!cv||x.city===cv)});var s=$('sort').value;l.sort(function(a,b){return s==='price'?a.display_price-b.display_price:s==='vram'?b.vram-a.vram:(b.uptime||0)-(a.uptime||0)});var g=$('grid');if(!l.length){g.innerHTML='<div class="col-span-full glass rounded-3xl p-12 text-center"><div class="font-bold">No GPUs match</div><a href="/gpu/host.html" class="btn-neon inline-block mt-4 px-6 py-2.5 rounded-xl text-sm">Park your GPU</a></div>';return}g.innerHTML=l.map(card).join('');var btns=document.querySelectorAll('.rentbtn');for(var i=0;i<btns.length;i++){btns[i].onclick=function(){openRent(this.dataset.host,this.dataset.gpu)}}}
-function load(){fetch(API+'/gpus').then(function(r){return r.json()}).then(function(d){ALL=d;$('navCount').textContent=ALL.length+' online';$('heroCount').textContent=ALL.length+' GPUs online';$('statGpus').textContent=ALL.length;$('upd').textContent=new Date().toLocaleTimeString();var cs=[];ALL.forEach(function(x){if(cs.indexOf(x.city)<0)cs.push(x.city)});var sel=$('city'),v=sel.value;sel.innerHTML='<option value="">All cities</option>'+cs.map(function(c){return '<option>'+c+'</option>'}).join('');if(v)sel.value=v;render()}).catch(function(){$('grid').innerHTML='<div class="col-span-full glass rounded-3xl p-10 text-center text-red-400">API offline</div>'})}
-var PENDING=null;
-function openRent(id,gpu){PENDING=id;$('mGpu').textContent=gpu;$('mMeta').textContent=id;var s=localStorage.getItem('pz_email');if(s)$('mEmail').value=s;$('modal').classList.remove('hidden')}
-function closeModal(){$('modal').classList.add('hidden')}
-function confirmRent(){var em=$('mEmail').value.trim();if(!em||em.indexOf('@')<0){toast('Enter a valid email');return}localStorage.setItem('pz_email',em);closeModal();fetch(API+'/rent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({host_id:PENDING,renter_email:em,docker_image:$('mImg').value})}).then(function(r){return r.json().then(function(j){return {s:r.status,j:j}})}).then(function(o){if(o.s===402){toast('Low wallet - adding Rs 500 demo credit');fetch(API+'/wallet/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,amount:50000})}).then(function(){toast('Rs 500 added. Hit Rent again')});return}if(o.s>=400){toast(o.j.detail||'Rent failed');return}toast('Instance ready');setTimeout(function(){location.href='/gpu/dashboard.html?email='+encodeURIComponent(em)},900)}).catch(function(){toast('Network error')})}
-$('q').addEventListener('input',render);$('sort').addEventListener('change',render);$('city').addEventListener('change',render);
-var chips=document.querySelectorAll('.fchip');for(var i=0;i<chips.length;i++){chips[i].onclick=function(){CHIP=this.dataset.chip;for(var k=0;k<chips.length;k++)chips[k].classList.remove('on');this.classList.add('on');render()}}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
-$('modal').addEventListener('click',function(e){if(e.target.id==='modal')closeModal()});
-load();setInterval(load,10000);
-</script></body></html>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span></a>
+        <p class="small muted mt-4">India's GPU parking marketplace. Rent by the minute, host from your gaming PC, pay and get paid in rupees.</p>
+        <p class="tiny faint mt-3 mono">support@parkzone.in</p>
+      </div>
+      <div class="foot-col">
+        <h3>Rent</h3>
+        <a href="#market">Live marketplace</a>
+        <a href="#pricing">Price comparison</a>
+        <a href="#savings">Savings calculator</a>
+        <a href="/dashboard">Console</a>
+        <a href="/api/docs">API reference</a>
+      </div>
+      <div class="foot-col">
+        <h3>Host</h3>
+        <a href="/host">Host &amp; earn</a>
+        <a href="/agent.exe">Download agent</a>
+        <a href="/host#faq">Host FAQ</a>
+        <a href="/status">Platform status</a>
+      </div>
+      <div class="foot-col">
+        <h3>Company</h3>
+        <a href="/terms">Terms of service</a>
+        <a href="/privacy">Privacy and DPDP</a>
+        <a href="/refund">Refund policy</a>
+        <a href="/refund#grievance">Grievance officer</a>
+        <a href="mailto:support@parkzone.in">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Copyright <span data-year>2026</span> ParkZone. All rights reserved.</span>
+      <span>Made in India - parkzone.in - single domain, always</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal" id="rentModal" hidden aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="rentTitle">
+    <span class="sheet-grab" aria-hidden="true"></span>
+    <div class="modal-head">
+      <div>
+        <h2 class="h3" id="rentTitle">Rent <span class="neon" id="rentGpu">this GPU</span></h2>
+        <p class="tiny faint mono" id="rentHost"></p>
+      </div>
+      <button class="modal-close" type="button" data-close-modal aria-label="Close">x</button>
+    </div>
+    <form class="stack mt-5" id="rentForm" novalidate>
+      <div class="field">
+        <label class="label" for="rentEmail">Your email - your wallet lives here</label>
+        <input class="input" id="rentEmail" type="email" name="email" placeholder="you@example.in" autocomplete="email" required>
+        <span class="err" id="rentEmailErr" hidden>Enter a valid email address</span>
+      </div>
+      <div class="field">
+        <label class="label" for="rentImage">Container image</label>
+        <select class="select" id="rentImage">
+          <option value="pytorch/pytorch">pytorch/pytorch - PyTorch + CUDA</option>
+          <option value="tensorflow/tensorflow:latest-gpu">tensorflow/tensorflow:latest-gpu</option>
+          <option value="nvidia/cuda:12.1.0-base-ubuntu22.04">nvidia/cuda:12.1.0-base-ubuntu22.04</option>
+        </select>
+      </div>
+      <div class="card card-pad" id="rentEstimate">
+        <div class="kv-row"><span>Rate</span><span class="neon" id="rentRate">-</span></div>
+        <div class="kv-row"><span>Per started minute</span><span id="rentPerMin">-</span></div>
+        <div class="kv-row"><span>Wallet balance</span><span id="rentBalance">-</span></div>
+        <div class="kv-row"><span>Credit needed to start</span><span id="rentHold">-</span></div>
+      </div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit" id="rentSubmit">Confirm and deploy</button>
+      <p class="tiny faint">Billing runs from your wallet per started minute. SSH and Jupyter details appear in the console immediately.</p>
+    </form>
+  </div>
+</div>
+
+<div class="toast-wrap" role="status" aria-live="polite"></div>
+</body>
+</html>

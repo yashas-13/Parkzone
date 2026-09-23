@@ -281,3 +281,78 @@ def test_cors_allows_only_the_apex_domain(client):
         headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "GET"},
     )
     assert blocked.headers.get("access-control-allow-origin") is None
+
+
+# --------------------------------------------------------------------------- #
+# Host-facing security + provisioning lifecycle                                #
+# --------------------------------------------------------------------------- #
+def test_host_routes_require_token_when_configured(client, host_payload, monkeypatch):
+    monkeypatch.setattr(api, "HOST_TOKEN", "host-secret")
+    assert client.post("/api/heartbeat", json=host_payload).status_code == 401
+    assert client.get("/api/jobs", params={"host_id": host_payload["host_id"]}).status_code == 401
+    ok = client.post("/api/heartbeat", json=host_payload, headers={"X-Host-Token": "host-secret"})
+    assert ok.status_code == 200
+    assert len(client.get("/api/gpus").json()) == 1
+
+
+def test_host_routes_stay_open_without_a_configured_token(client, host_payload):
+    assert api.HOST_TOKEN == ""
+    assert client.post("/api/heartbeat", json=host_payload).status_code == 200
+
+
+def test_job_status_closes_the_provisioning_loop(client, host_payload):
+    fund(client)
+    online_host(client, host_payload)
+    instance = client.post("/api/rent", json={"host_id": host_payload["host_id"], "renter_email": RENTER}).json()
+    body = {
+        "host_id": host_payload["host_id"],
+        "instance_id": instance["instance_id"],
+        "status": "running",
+        "container_id": "abc123def456",
+    }
+    r = client.post("/api/job-status", json=body)
+    assert r.status_code == 200 and r.json()["instance_status"] == "running"
+    row = client.get("/api/instances", params={"email": RENTER}).json()[0]
+    assert row["status"] == "running"
+    # a late duplicate report is ignored, not an error
+    assert client.post("/api/job-status", json=body).json()["status"] == "ignored"
+
+
+def test_job_status_reports_failure_and_rejects_other_hosts(client, host_payload):
+    fund(client)
+    online_host(client, host_payload, host_id=host_payload["host_id"])
+    instance = client.post("/api/rent", json={"host_id": host_payload["host_id"], "renter_email": RENTER}).json()
+    wrong = {"host_id": "PC_SOMEONEELSE", "instance_id": instance["instance_id"], "status": "failed"}
+    assert client.post("/api/job-status", json=wrong).status_code == 403
+    fail = {"host_id": host_payload["host_id"], "instance_id": instance["instance_id"], "status": "failed", "detail": "docker: no CUDA device"}
+    assert client.post("/api/job-status", json=fail).json()["instance_status"] == "failed"
+    assert client.post("/api/job-status", json={"host_id": host_payload["host_id"], "instance_id": "not-an-id", "status": "failed"}).status_code == 404
+    assert client.post("/api/job-status", json={"host_id": host_payload["host_id"], "instance_id": instance["instance_id"], "status": "weird"}).status_code == 422
+
+
+def test_a_failed_instance_is_never_billed(client, host_payload):
+    fund(client, amount=50000)
+    online_host(client, host_payload)
+    instance = client.post("/api/rent", json={"host_id": host_payload["host_id"], "renter_email": RENTER}).json()
+    client.post("/api/job-status", json={"host_id": host_payload["host_id"], "instance_id": instance["instance_id"], "status": "failed"})
+    # the instance is already closed, so stop is a conflict rather than a charge
+    assert client.post("/api/stop", json={"instance_id": instance["instance_id"]}).status_code == 409
+    assert client.get("/api/wallet", params={"email": RENTER}).json()["balance"] == 50000
+    statuses = [row["status"] for row in client.get("/api/instances", params={"email": RENTER}).json()]
+    assert statuses == ["failed"]
+
+
+def test_repeat_running_reports_do_not_reset_the_billing_clock(client, host_payload):
+    """A late duplicate report must not restart billing from now()."""
+    import time as _time
+
+    fund(client)
+    online_host(client, host_payload)
+    instance = client.post("/api/rent", json={"host_id": host_payload["host_id"], "renter_email": RENTER}).json()
+    body = {"host_id": host_payload["host_id"], "instance_id": instance["instance_id"], "status": "running"}
+    first = client.post("/api/job-status", json=body).json()
+    started = client.get("/api/instances", params={"email": RENTER}).json()[0]["started_at"]
+    _time.sleep(0.05)
+    assert client.post("/api/job-status", json=body).json()["status"] == "ignored"
+    assert client.get("/api/instances", params={"email": RENTER}).json()[0]["started_at"] == started
+    assert first["instance_status"] == "running"

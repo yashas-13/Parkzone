@@ -31,14 +31,10 @@ sed \
   "$ROOT/nginx-parkzone.conf" > "$SB/conf/site.conf"
 
 cp "$ROOT/ops/pz-security-headers.conf" "$SB/snippets/"
-echo 'parkzone' > "$SB/public/index.html"
-echo 'host page' > "$SB/public/host.html"
-echo 'console' > "$SB/public/dashboard.html"
-echo 'status' > "$SB/public/status.html"
-echo 'terms' > "$SB/public/terms.html"
-echo 'not found' > "$SB/public/404.html"
-echo 'body{}' > "$SB/public/assets/pz.css"
-echo 'SECRET' > "$SB/public/backend.env"
+# The REAL site is served, so the integration checks below exercise the pages
+# that ship rather than fixtures.
+cp -r "$ROOT/public/." "$SB/public/"
+echo 'SECRET-DO-NOT-SERVE' > "$SB/public/backend.env"
 
 MIME=/data/data/com.termux/files/usr/etc/nginx/mime.types
 [ -f /etc/nginx/mime.types ] && MIME=/etc/nginx/mime.types
@@ -112,6 +108,15 @@ if [ "$RUN" = 1 ]; then
   H='Host: parkzone.in'
   chk 'http -> https redirect (301)'          "[ \"\$(code -H '$H' http://127.0.0.1:8081/)\" = 301 ]"
   chk 'https / serves the landing page'       "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/)\" = 200 ]"
+  chk 'landing page is the real one'          "curl -sk -H '$H' https://127.0.0.1:8443/ | grep -q 'Indian GPUs for'"
+  chk '/host serves the host programme'      "curl -sk -H '$H' https://127.0.0.1:8443/host | grep -q 'Your GPU earns while you sleep'"
+  chk '/dashboard serves the console'        "curl -sk -H '$H' https://127.0.0.1:8443/dashboard | grep -q 'Wallet balance'"
+  chk '/terms /privacy /refund /status 200'  "[ \"\$(for p in terms privacy refund status; do code -k -H '$H' https://127.0.0.1:8443/\$p; done)\" = '200200200200' ]"
+  chk 'design system css is cached immutable' "curl -sk -H '$H' -D - -o /dev/null https://127.0.0.1:8443/assets/pz.css | grep -qi 'immutable'"
+  chk 'self-hosted font serves'              "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/assets/fonts/inter-latin.woff2)\" = 200 ]"
+  chk 'og image serves for social cards'     "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/assets/og.png)\" = 200 ]"
+  chk 'CSP header present'                   "curl -sk -H '$H' -D - -o /dev/null https://127.0.0.1:8443/ | grep -qi "content-security-policy""
+  chk 'sitemap and robots serve'             "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/sitemap.xml)\" = 200 ]"
   chk 'clean URL /host -> host.html'          "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/host)\" = 200 ]"
   chk 'clean URL /dashboard'                  "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/dashboard)\" = 200 ]"
   chk 'unknown path 404s (no soft-404)'       "[ \"\$(code -k -H '$H' https://127.0.0.1:8443/nope)\" = 404 ]"

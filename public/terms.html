@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Terms of service - ParkZone</title>
+<meta name="description" content="The rules for renting GPUs and hosting GPUs on parkzone.in, including billing, prohibited use, liability and governing law.">
+<meta name="theme-color" content="#05070a">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://parkzone.in/terms">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ParkZone">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Terms of service - ParkZone">
+<meta property="og:description" content="The rules for renting GPUs and hosting GPUs on parkzone.in, including billing, prohibited use, liability and governing law.">
+<meta property="og:url" content="https://parkzone.in/terms">
+<meta property="og:image" content="https://parkzone.in/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ParkZone - Indian GPUs for Indian AI">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terms of service - ParkZone">
+<meta name="twitter:description" content="The rules for renting GPUs and hosting GPUs on parkzone.in, including billing, prohibited use, liability and governing law.">
+<meta name="twitter:image" content="https://parkzone.in/assets/og.png">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preload" href="/assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/pz.css">
+<script src="/assets/pz.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="decor" aria-hidden="true"><div class="bg-grid"></div><div class="orb orb-a"></div></div>
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>
+        <span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span>
+        <span class="sr-only">home</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="badge badge-live nowrap"><span class="dot"></span><span id="navCount">loading</span></span>
+      <a class="btn btn-primary btn-sm" href="#market">Rent a GPU</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navDrawer" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drawer" id="navDrawer">
+    <div class="container">
+      <a href="/">Marketplace</a>
+      <a href="/host">Host &amp; earn</a>
+      <a href="/dashboard">Console</a>
+      <a href="/status">Status</a>
+      <a class="btn btn-primary btn-block mt-4" href="#market">Rent a GPU</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="page">
+  <section class="section">
+    <div class="container">
+      <h1 class="h1">Terms of service</h1>
+      <p class="doc-meta mt-4"><span>Version 1.0</span><span>Effective 1 October 2026</span><span>Governing law: India</span></p>
+      <div class="doc mt-6">
+        <section>
+          <h2>1. What ParkZone is</h2>
+          <p>ParkZone (<span class="mono">parkzone.in</span>) is a marketplace. It connects people who want to rent GPU compute (&quot;renters&quot;) with people who own GPUs and want to rent them out (&quot;hosts&quot;). ParkZone is not the owner of the hardware and is not a cloud provider. Hosts are independent sellers of compute; ParkZone provides the discovery, metering, billing and payout layer.</p>
+        </section>
+        <section>
+          <h2>2. Accounts</h2>
+          <p>You identify yourself with an email address. You are responsible for the address you supply, for keeping access to it, and for everything done through it. One person may be both a renter and a host. You must be at least 18 years old and legally able to enter into a contract.</p>
+        </section>
+        <section>
+          <h2>3. Wallet and billing</h2>
+          <ul>
+            <li>Prices are in Indian rupees and are set per GPU by the host. The renter pays the host's rate plus ParkZone's platform fee; the host receives the full rate they set.</li>
+            <li>Billing is per <strong>started minute</strong>. A minute begins when an instance reaches running state and ends when it is stopped. A partial minute is charged as a full minute.</li>
+            <li>Funds sit in your ParkZone wallet as prepaid credit, denominated in paise. An instance will not start unless your balance covers the minimum credit hold shown at checkout.</li>
+            <li>Balances are never driven below zero: if a balance runs out mid-session, the charge is capped at the remaining balance and the instance is stopped.</li>
+            <li>Every credit and debit is recorded in an append-only ledger visible in your console.</li>
+            <li>Top-ups are non-transferable between accounts. Refunds are governed by the <a href="/refund">refund policy</a>.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>4. Renter obligations</h2>
+          <ul>
+            <li>Do not run cryptocurrency mining, password cracking, denial-of-service traffic, port scanning of third parties, or any other abusive or unlawful workload.</li>
+            <li>Runtime images are restricted to a published allow-list. Attempting to bypass it is a breach of these terms.</li>
+            <li>You are responsible for anything you upload, train, serve or download inside your instance, and for complying with the licences of the software you use.</li>
+            <li>Do not attempt to access the host's operating system, other tenants' data, or the ParkZone infrastructure beyond the endpoints provided to you.</li>
+            <li>Instances are single-tenant and non-resellable. Do not provide public third-party access to an instance you rent.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>5. Host obligations</h2>
+          <ul>
+            <li>Only list hardware you own or are authorised to rent out, with driver and Docker versions that actually support the workloads you accept.</li>
+            <li>Do not inspect, retain, copy or interfere with renter data, containers or traffic. Hosts are the custodian of the machine, not of the renter's content.</li>
+            <li>Notify ParkZone promptly of hardware faults. Uptime is tracked; sustained low uptime lowers marketplace ranking and may end the listing.</li>
+            <li>You are responsible for your own electricity cost, hardware maintenance, internet connection and any tax on income you receive. ParkZone provides an earnings statement for your records.</li>
+            <li>Payouts require identity verification above the statutory threshold, and are made to the UPI identifier on your host profile.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>6. Prohibited use</h2>
+          <p>The following are grounds for immediate suspension without refund: unlawful activity, child sexual abuse material, malware distribution, sanctions evasion, mining payloads, excessive resource abuse that degrades other tenants, scraping or attacking other users, and misrepresenting GPU hardware in a listing.</p>
+        </section>
+        <section>
+          <h2>7. Your content and intellectual property</h2>
+          <p>You keep all rights to the code, data, models and weights you bring. We claim no licence over them. We only process the metadata needed to run the service: instance status, resource usage, endpoints and billing records.</p>
+        </section>
+        <section>
+          <h2>8. Availability</h2>
+          <p>Compute is supplied by independent hosts, so ParkZone does not offer a data-centre SLA and does not warrant that a specific GPU will be available at a specific moment. We do commit to billing only for minutes an instance is up, and to crediting you if an instance never started. See the <a href="/status">status page</a> for current health and incident history.</p>
+        </section>
+        <section>
+          <h2>9. Suspension and termination</h2>
+          <p>We may suspend or terminate an account that breaches these terms, that is required to be blocked by law, or that presents a security or fraud risk. Where it is lawful and practical we will tell you why. On termination, any unused wallet balance is refunded to the original payment method, minus amounts subject to a chargeback or dispute.</p>
+        </section>
+        <section>
+          <h2>10. Limitation of liability</h2>
+          <p>To the maximum extent permitted by Indian law, ParkZone's total liability for any claim is limited to the greater of the fees you paid ParkZone in the three months before the claim, or Rs 1,000. We are not liable for indirect or consequential loss, lost profits, lost data or lost research time. Nothing here excludes liability that cannot lawfully be excluded.</p>
+        </section>
+        <section>
+          <h2>11. Changes and governing law</h2>
+          <p>We may update these terms; material changes will be posted here with a new version number and an effective date. These terms are governed by the laws of India, and the courts at the place of ParkZone's registered office have exclusive jurisdiction, without prejudice to your statutory consumer rights.</p>
+        </section>
+        <section>
+          <h2>12. Contact</h2>
+          <p>Support: <a href="mailto:support@parkzone.in">support@parkzone.in</a>. Hosts: <a href="mailto:hosts@parkzone.in">hosts@parkzone.in</a>. Grievance officer details are on the <a href="/refund#grievance">refund policy</a> page.</p>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">P</span><span class="brand-name">PARK<span class="neon">ZONE</span><span class="brand-tag">.in</span></span></a>
+        <p class="small muted mt-4">India's GPU parking marketplace. Rent by the minute, host from your gaming PC, pay and get paid in rupees.</p>
+        <p class="tiny faint mt-3 mono">support@parkzone.in</p>
+      </div>
+      <div class="foot-col">
+        <h3>Rent</h3>
+        <a href="#market">Live marketplace</a>
+        <a href="#pricing">Price comparison</a>
+        <a href="#savings">Savings calculator</a>
+        <a href="/dashboard">Console</a>
+        <a href="/api/docs">API reference</a>
+      </div>
+      <div class="foot-col">
+        <h3>Host</h3>
+        <a href="/host">Host &amp; earn</a>
+        <a href="/agent.exe">Download agent</a>
+        <a href="/host#faq">Host FAQ</a>
+        <a href="/status">Platform status</a>
+      </div>
+      <div class="foot-col">
+        <h3>Company</h3>
+        <a href="/terms">Terms of service</a>
+        <a href="/privacy">Privacy and DPDP</a>
+        <a href="/refund">Refund policy</a>
+        <a href="/refund#grievance">Grievance officer</a>
+        <a href="mailto:support@parkzone.in">Contact</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>Copyright <span data-year>2026</span> ParkZone. All rights reserved.</span>
+      <span>Made in India - parkzone.in - single domain, always</span>
+    </div>
+  </div>
+</footer>
+<div class="toast-wrap" role="status" aria-live="polite"></div>
+</body>
+</html>
