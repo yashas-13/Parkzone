@@ -36,7 +36,10 @@
   PZ.cssVar = function (el, name, value) { if (el && el.style) { el.style.setProperty(name, value); } };
 
   PZ.debounce = function (fn, wait) {
-    var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, wait || 200); };
+    // `wait` is honoured exactly: 0 means "next tick", and only an omitted wait
+    // falls back to the 200ms default (the old `wait || 200` turned 0 into 200).
+    var delay = (wait === undefined || wait === null) ? 200 : wait;
+    var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, delay); };
   };
 
   /* ------------------------------------------------------------ numbers -- */

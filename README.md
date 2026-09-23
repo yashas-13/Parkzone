@@ -37,9 +37,21 @@ pip install -r requirements-dev.txt
 uvicorn main:app --host 127.0.0.1 --port 8080      # no MONGO_URI -> in-memory mongomock
 
 cd ..
-python3 -m pytest tests -q                         # 33 API contract tests
-bash tests/smoke.sh                                # 29 live HTTP checks
-bash ops/validate-nginx.sh --run                   # nginx syntax + routing integration
+bash tests/run_all.sh --live    # everything below in one go, CI-style
+
+python3 -m pytest tests -q       # 39 API contract tests
+python3 tests/check_frontend.py  # classes, links, CSP, a11y, SEO across all 8 pages
+node tests/render.test.cjs       # renders the real pages in jsdom + runs their JS
+bash tests/smoke.sh              # live HTTP behaviour incl. billing and error paths
+bash ops/validate-nginx.sh --run # nginx syntax + routing integration
+```
+
+Regenerate derived assets when they change:
+
+```bash
+python3 ops/build_pages.py   # policy/status/404 pages from ops/build_pages.py
+python3 ops/fetch_fonts.py   # self-hosted Inter + JetBrains Mono subsets
+python3 ops/make_og.py       # social card + app icons
 ```
 
 Serve the static site locally with `python3 -m http.server 8000 -d public`
