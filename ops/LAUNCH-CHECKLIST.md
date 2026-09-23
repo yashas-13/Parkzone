@@ -32,6 +32,10 @@ Everything below must be true before `parkzone.in` takes real money. Items marke
       `pyinstaller --onefile --noconsole --name ParkZoneAgent agent.py`
 - [ ] Publish it as `public/agent.exe` (nginx already serves it with a download
       header). The host page disables the button automatically until this exists.
+      **This is the one expected warning:** `tests/check_frontend.py` reports
+      `WARN=2` (the two download buttons on `/host`) until the real signed build
+      is committed. It is deliberately NOT committed as a placeholder - a fake
+      `.exe` would be worse than a 404.
 - [ ] Publish its SHA-256 on `/host` and keep the previous hash for audit.
 - [ ] Smoke it on a real Windows 10/11 box with WSL2 + Docker + an NVIDIA driver
       before accepting host signups.
