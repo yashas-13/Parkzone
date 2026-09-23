@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Console - ParkZone</title><script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--neon:#00FF88;--bg:#050807}
+*{font-family:'Inter',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+body{background:var(--bg);color:#e8ece9;overflow-x:hidden}
+.bg-grid{background-image:linear-gradient(rgba(0,255,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.05) 1px,transparent 1px);background-size:44px 44px}
+.glow-orb{position:absolute;border-radius:9999px;filter:blur(110px);opacity:.25;pointer-events:none}
+.neon{color:var(--neon)}
+.grad-text{background:linear-gradient(92deg,#fff 20%,var(--neon) 60%,#7df9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,136,.16);backdrop-filter:blur(14px)}
+.btn-neon{background:linear-gradient(135deg,#00FF88,#00cc6e);color:#03130b;font-weight:800;box-shadow:0 0 24px rgba(0,255,136,.35);transition:.25s}
+.btn-neon:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,255,136,.55)}
+.btn-ghost{border:1px solid rgba(0,255,136,.35);color:var(--neon);transition:.25s}
+.btn-ghost:hover{background:rgba(0,255,136,.1)}
+.gpu-card{transition:.3s;position:relative;overflow:hidden}
+.gpu-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,136,.14)}
+.live-dot{width:8px;height:8px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.4}}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.fade-up{animation:fu .7s cubic-bezier(.2,.7,.3,1) both}
+.uptime-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.uptime-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00cc6e,var(--neon))}
+.chip{font-size:11px;padding:2px 10px;border-radius:99px;border:1px solid rgba(0,255,136,.3);color:var(--neon);background:rgba(0,255,136,.07);cursor:pointer}
+.chip.on{background:rgba(0,255,136,.2)}
+input,select{background:#0a0f0c;border:1px solid rgba(0,255,136,.25);color:#e8ece9;border-radius:10px}
+input:focus,select:focus{outline:none;border-color:var(--neon)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:99;display:flex;flex-direction:column;gap:8px}
+.toast{background:#0a120d;border:1px solid rgba(0,255,136,.4);border-radius:12px;padding:12px 18px;font-size:14px;animation:fu .3s}
+.modal-bg{background:rgba(0,0,0,.75)}
+.tick{animation:fu .5s both}
+.stat-num{font-size:1.6rem;font-weight:800}
+.faq-a{display:none}
+.faq.open .faq-a{display:block}
+.faq.open .faq-q span:last-child{transform:rotate(45deg)}
+</style></head><body><div class="fixed inset-0 bg-grid pointer-events-none"></div><div class="glow-orb" style="width:560px;height:560px;background:#00FF88;top:-200px;left:50%;transform:translateX(-50%)"></div><nav class="sticky top-0 z-50 border-b border-green-900" style="background:rgba(5,8,7,.85)"><div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between"><a href="/gpu/" class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl grid place-items-center font-black text-black text-lg" style="background:linear-gradient(135deg,#00FF88,#00b35c)">P</div><div class="text-xl font-extrabold">PARK<span class="neon">ZONE</span></div></a><div class="hidden md:flex items-center gap-7 text-sm"><a href="/gpu/" class="text-gray-300 hover:text-white transition">Marketplace</a><a href="/gpu/host.html" class="text-gray-300 hover:text-white transition">Host & Earn</a><a href="/gpu/dashboard.html" class="neon font-semibold">Dashboard</a></div><div class="flex items-center gap-3"><a href="/gpu/dashboard.html" class="btn-neon text-sm px-5 py-2 rounded-xl">Rent a GPU</a></div></div></nav><main class="relative max-w-6xl mx-auto px-5 py-10">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div><h1 class="text-3xl font-black">Console</h1><p id="who" class="text-sm text-gray-500 mono mt-1"></p></div>
+<button onclick="logout()" class="btn-ghost text-xs px-4 py-2 rounded-xl">Switch email</button>
+</div>
+<div class="grid md:grid-cols-3 gap-4 mt-6">
+<div class="glass rounded-3xl p-6 md:col-span-2" style="background:linear-gradient(135deg,rgba(0,255,136,.1),rgba(0,255,136,.02))"><div class="text-xs text-gray-400">WALLET BALANCE</div><div id="bal" class="text-5xl font-black mono mt-1">Rs 0.00</div><div class="flex flex-wrap gap-2 mt-4"><button onclick="addMoney(50000)" class="btn-neon px-5 py-2.5 rounded-xl text-sm">+ Rs 500</button><button onclick="addMoney(100000)" class="btn-neon px-5 py-2.5 rounded-xl text-sm">+ Rs 1000</button><button onclick="addMoney(500000)" class="btn-ghost px-5 py-2.5 rounded-xl text-sm">+ Rs 5000</button></div><p class="text-xs text-gray-600 mt-3">Top-ups are demo-credited instantly. Razorpay auto-debit ships next.</p></div>
+<div class="glass rounded-3xl p-6"><div class="text-xs text-gray-400">THIS SESSION</div><div class="mt-2 space-y-2 text-sm"><div class="flex justify-between"><span class="text-gray-500">Running</span><span id="runN" class="mono">0</span></div><div class="flex justify-between"><span class="text-gray-500">Instances</span><span id="instN" class="mono">0</span></div></div><a href="/gpu/" class="btn-ghost block text-center mt-5 py-2.5 rounded-xl text-sm font-semibold">+ Rent another GPU</a></div>
+</div>
+<div id="rentbox" class="hidden glass rounded-3xl p-6 mt-4" style="border-color:rgba(0,255,136,.45)"><b>Confirm rental - <span id="rh" class="neon mono"></span></b><div class="flex flex-wrap gap-2 mt-3 items-center"><select id="img" class="text-sm px-3 py-2.5"><option>pytorch/pytorch</option><option>tensorflow/tensorflow:latest-gpu</option><option>nvidia/cuda:12.1.0-base-ubuntu22.04</option></select><button onclick="doRent()" class="btn-neon px-6 py-2.5 rounded-xl text-sm">Deploy now</button></div><p class="text-xs text-gray-500 mt-2">Billed per minute from wallet. SSH plus Jupyter issued in seconds.</p></div>
+<h2 class="font-extrabold text-xl mt-8 mb-3">My instances</h2>
+<div id="inst" class="grid md:grid-cols-2 gap-4"></div>
+</main>
+<footer class="border-t border-green-900 py-8 text-center text-xs text-gray-600">PARKZONE.in/gpu</footer><div id="toast"></div><script>
+var API='/gpu/api';
+function gid(id){return document.getElementById(id)}
+function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;gid('toast').appendChild(t);setTimeout(function(){t.remove()},3200)}
+var q=new URLSearchParams(location.search);
+var email=q.get('email')||localStorage.getItem('pz_email')||'';
+var hostId=q.get('host_id')||'';
+if(!email){var e=prompt('Enter your email:');if(e){localStorage.setItem('pz_email',e);location.search='?email='+encodeURIComponent(e)}}
+else localStorage.setItem('pz_email',email);
+gid('who').textContent=email;
+if(hostId){gid('rentbox').classList.remove('hidden');gid('rh').textContent=hostId}
+function logout(){localStorage.removeItem('pz_email');location.search=''}
+function copyT(t,btn){navigator.clipboard.writeText(t).then(function(){btn.textContent='Copied'})}
+function bal(){fetch(API+'/wallet?email='+encodeURIComponent(email)).then(function(r){return r.json()}).then(function(j){gid('bal').textContent='Rs '+(j.balance/100).toFixed(2)})}
+function addMoney(p){fetch(API+'/wallet/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,amount:p})}).then(bal).then(function(){toast('Rs '+(p/100)+' added')})}
+function doRent(){fetch(API+'/rent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({host_id:hostId,renter_email:email,docker_image:gid('img').value})}).then(function(r){return r.json().then(function(j){return {s:r.status,j:j}})}).then(function(o){if(o.s>=400){toast(o.j.detail||'Rent failed');return}toast('Deployed');loadInst()})}
+function stopIt(id){if(!confirm('Stop instance? Billing ends now.'))return;fetch(API+'/stop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instance_id:id})}).then(function(r){return r.json()}).then(function(j){toast('Stopped');bal();loadInst()})}
+function card(x){var live=x.status==='running';
+return '<div class="glass rounded-3xl p-5 tick"><div class="flex items-center justify-between"><span class="mono font-bold">'+x.host_id+'</span><span class="chip">'+x.status+'</span></div><div class="mt-3 text-xs text-gray-500">SSH</div><div class="flex gap-2 items-center"><code class="mono text-xs flex-1 glass rounded-xl px-3 py-2">'+x.ssh+'</code><button onclick="copyT(this.previousElementSibling.textContent,this)" class="btn-ghost text-xs px-3 py-2 rounded-xl">Copy</button></div><div class="mt-2 text-xs text-gray-500">JUPYTER</div><div class="flex gap-2 items-center"><code class="mono text-xs flex-1 glass rounded-xl px-3 py-2">'+x.jupyter+'</code><a href="'+x.jupyter+'" target="_blank" class="btn-ghost text-xs px-3 py-2 rounded-xl">Open</a></div>'+(live?'<button onclick="stopIt(this.dataset.i)" data-i="'+x.instance_id+'" class="w-full mt-4 py-2.5 rounded-xl text-sm font-bold" style="background:rgba(255,80,80,.12);border:1px solid rgba(255,80,80,.4);color:#ff8080">Stop instance</button>':'')+'</div>'}
+function loadInst(){fetch(API+'/instances?email='+encodeURIComponent(email)).then(function(r){return r.json()}).then(function(j){var d=gid('inst');gid('instN').textContent=j.length;var run=j.filter(function(x){return x.status==='running'}).length;gid('runN').textContent=run;if(!j.length){d.innerHTML='<div class="glass rounded-3xl p-10 text-center text-sm text-gray-500">No instances yet. <a class="neon font-semibold" href="/gpu/">Rent your first GPU</a></div>';return}d.innerHTML=j.map(card).join('')})}
+if(email){bal();loadInst();setInterval(function(){bal();loadInst()},15000)}
+</script></body></html>

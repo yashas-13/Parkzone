@@ -1,0 +1,1 @@
+ParkZone agent.exe placeholder - build on Windows: pyinstaller --onefile --noconsole agent.py

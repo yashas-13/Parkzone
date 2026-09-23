@@ -1,0 +1,36 @@
+# --- secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# --- build / release artefacts ---
+dist/
+build/
+*.spec
+*.tar.gz
+*.zip
+*.exe
+public/agent.exe
+
+# --- editor / os ---
+.idea/
+.vscode/
+.DS_Store
+*.log
+logs/
+
+# --- local dev data ---
+*.db
+*.sqlite3
+mongodump/
+backups/

@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ParkZone - Indian GPUs for Indian AI | RTX 4090 at Rs 29/hr</title><script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--neon:#00FF88;--bg:#050807}
+*{font-family:'Inter',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+body{background:var(--bg);color:#e8ece9;overflow-x:hidden}
+.bg-grid{background-image:linear-gradient(rgba(0,255,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.05) 1px,transparent 1px);background-size:44px 44px}
+.glow-orb{position:absolute;border-radius:9999px;filter:blur(110px);opacity:.25;pointer-events:none}
+.neon{color:var(--neon)}
+.grad-text{background:linear-gradient(92deg,#fff 20%,var(--neon) 60%,#7df9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,136,.16);backdrop-filter:blur(14px)}
+.btn-neon{background:linear-gradient(135deg,#00FF88,#00cc6e);color:#03130b;font-weight:800;box-shadow:0 0 24px rgba(0,255,136,.35);transition:.25s}
+.btn-neon:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,255,136,.55)}
+.btn-ghost{border:1px solid rgba(0,255,136,.35);color:var(--neon);transition:.25s}
+.btn-ghost:hover{background:rgba(0,255,136,.1)}
+.gpu-card{transition:.3s;position:relative;overflow:hidden}
+.gpu-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,136,.14)}
+.live-dot{width:8px;height:8px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.4}}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.fade-up{animation:fu .7s cubic-bezier(.2,.7,.3,1) both}
+.uptime-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.uptime-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00cc6e,var(--neon))}
+.chip{font-size:11px;padding:2px 10px;border-radius:99px;border:1px solid rgba(0,255,136,.3);color:var(--neon);background:rgba(0,255,136,.07);cursor:pointer}
+.chip.on{background:rgba(0,255,136,.2)}
+input,select{background:#0a0f0c;border:1px solid rgba(0,255,136,.25);color:#e8ece9;border-radius:10px}
+input:focus,select:focus{outline:none;border-color:var(--neon)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:99;display:flex;flex-direction:column;gap:8px}
+.toast{background:#0a120d;border:1px solid rgba(0,255,136,.4);border-radius:12px;padding:12px 18px;font-size:14px;animation:fu .3s}
+.modal-bg{background:rgba(0,0,0,.75)}
+.tick{animation:fu .5s both}
+.stat-num{font-size:1.6rem;font-weight:800}
+.faq-a{display:none}
+.faq.open .faq-a{display:block}
+.faq.open .faq-q span:last-child{transform:rotate(45deg)}
+</style></head><body><div class="fixed inset-0 bg-grid pointer-events-none"></div><div class="glow-orb" style="width:560px;height:560px;background:#00FF88;top:-200px;left:50%;transform:translateX(-50%)"></div><nav class="sticky top-0 z-50 border-b border-green-900" style="background:rgba(5,8,7,.85);backdrop-filter:blur(16px)"><div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between"><a href="/gpu/" class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl grid place-items-center font-black text-black text-lg" style="background:linear-gradient(135deg,#00FF88,#00b35c)">P</div><div class="text-xl font-extrabold">PARK<span class="neon">ZONE</span><span class="text-xs text-gray-500">.in/gpu</span></div></a><div class="hidden md:flex items-center gap-7 text-sm"><a href="/gpu/" class="neon font-semibold">Marketplace</a><a href="/gpu/host.html" class="text-gray-300 hover:text-white transition">Host & Earn</a><a href="/gpu/dashboard.html" class="text-gray-300 hover:text-white transition">Dashboard</a></div><div class="flex items-center gap-3"><div class="hidden sm:flex items-center gap-2 text-xs glass rounded-full px-3.5 py-1.5"><span class="live-dot"></span><span id="navCount" class="mono neon font-semibold">0 online</span></div><a href="/gpu/dashboard.html" class="btn-neon text-sm px-5 py-2 rounded-xl">Rent a GPU</a></div></div></nav>
+<header class="relative max-w-7xl mx-auto px-5 pt-16 pb-10 text-center">
+<div class="fade-up inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs mb-6"><span class="live-dot"></span><span class="text-gray-300">Live marketplace - <span id="heroCount" class="neon font-semibold">0 GPUs online</span> - updated <span id="upd" class="mono">-</span></span></div>
+<h1 class="fade-up font-black leading-tight" style="font-size:clamp(2.4rem,6vw,4rem);animation-delay:.08s">Indian GPUs for<br><span class="grad-text">Indian AI.</span></h1>
+<p class="fade-up mt-5 text-lg text-gray-400 max-w-2xl mx-auto" style="animation-delay:.16s">RTX 4090 from <span class="neon font-bold text-xl">Rs 29/hr</span> - <span class="text-white font-semibold">70% cheaper than AWS.</span> Idle gaming rigs, one-click PyTorch, per-minute billing.</p>
+<div class="fade-up mt-8 flex flex-wrap justify-center gap-3" style="animation-delay:.24s"><a href="#market" class="btn-neon px-7 py-3.5 rounded-2xl">Browse live GPUs</a><a href="/gpu/host.html" class="btn-ghost px-7 py-3.5 rounded-2xl font-semibold">Park your GPU, earn Rs 5k/mo</a></div>
+<div class="fade-up mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto text-left" style="animation-delay:.32s">
+<div class="glass rounded-2xl p-4"><div class="stat-num neon mono" id="statGpus">-</div><div class="text-xs text-gray-500 mt-1">GPUs online now</div></div>
+<div class="glass rounded-2xl p-4"><div class="stat-num mono">Rs 29</div><div class="text-xs text-gray-500 mt-1">4090/hr, vs Rs 98 AWS</div></div>
+<div class="glass rounded-2xl p-4"><div class="stat-num mono">70%</div><div class="text-xs text-gray-500 mt-1">cheaper than cloud</div></div>
+<div class="glass rounded-2xl p-4"><div class="stat-num mono">60s</div><div class="text-xs text-gray-500 mt-1">per-minute billing</div></div>
+</div></header>
+<main id="market" class="relative max-w-7xl mx-auto px-5 pb-24">
+<div class="flex flex-wrap items-end justify-between gap-3 mb-4"><div><h2 class="text-2xl font-extrabold">Live marketplace</h2><p class="text-sm text-gray-500 mt-1">Auto-refreshes every 10s, prices include ParkZone fee</p></div>
+<div class="flex flex-wrap gap-2 items-center"><input id="q" placeholder="Search GPU / city" class="text-sm px-4 py-2 w-52"><select id="sort" class="text-sm px-3 py-2"><option value="price">Sort: price low-high</option><option value="vram">Sort: VRAM high-low</option><option value="uptime">Sort: uptime</option></select><select id="city" class="text-sm px-3 py-2"><option value="">All cities</option></select></div></div>
+<div class="flex gap-2 flex-wrap mb-4"><button data-chip="all" class="chip fchip on">All GPUs</button><button data-chip="4090" class="chip fchip">RTX 4090</button><button data-chip="4080" class="chip fchip">RTX 4080</button><button data-chip="3090" class="chip fchip">RTX 3090</button><button data-chip="3060" class="chip fchip">RTX 3060</button><button data-chip="A100" class="chip fchip">A100 / H100</button></div>
+<div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+<div class="text-center mt-10 text-sm text-gray-500">Own a gaming PC? <a href="/gpu/host.html" class="neon font-semibold">List it in 2 minutes</a></div>
+</main>
+<div id="modal" class="hidden fixed inset-0 z-50 modal-bg grid place-items-center p-4" style="background:rgba(0,0,0,.75)"><div class="glass rounded-3xl max-w-md w-full p-7" style="background:#0a120d"><h3 class="text-xl font-extrabold">Rent <span id="mGpu" class="neon"></span></h3><p class="text-sm text-gray-400 mt-1 mono" id="mMeta"></p><label class="text-xs text-gray-400 block mt-4 mb-1">Your email</label><input id="mEmail" type="email" placeholder="you@example.in" class="w-full text-sm px-4 py-2.5"><label class="text-xs text-gray-400 block mt-3 mb-1">Docker image</label><select id="mImg" class="w-full text-sm px-3 py-2.5"><option>pytorch/pytorch</option><option>tensorflow/tensorflow:latest-gpu</option><option>nvidia/cuda:12.1.0-base-ubuntu22.04</option></select><div class="flex gap-2 mt-5"><button onclick="confirmRent()" class="btn-neon flex-1 py-3 rounded-xl text-sm">Confirm rent</button><button onclick="closeModal()" class="btn-ghost px-5 py-3 rounded-xl text-sm">Cancel</button></div><p class="text-xs text-gray-600 mt-3">Per-minute billing from wallet, SSH + Jupyter issued instantly</p></div></div>
+<footer class="border-t border-green-900 py-8 text-center text-xs text-gray-600">PARK<span class="neon">ZONE</span>.in/gpu - Vast.ai-grade power, desi prices - <a class="hover:text-gray-300" href="/gpu/host.html">Host</a> - <a class="hover:text-gray-300" href="/gpu/dashboard.html">Dashboard</a></footer><div id="toast"></div><script>
+var API='/gpu/api',ALL=[],CHIP='all';
+function $(id){return document.getElementById(id)}
+function toast(m){var t=document.createElement('div');t.className='toast';t.textContent=m;$('toast').appendChild(t);setTimeout(function(){t.remove()},3200)}
+function tier(n){if(/4090/i.test(n))return 'FLAGSHIP';if(/4080|3090/i.test(n))return 'HIGH-END';if(/A100|H100/i.test(n))return 'DATACENTER';return 'BUDGET'}
+function gb(v){return v>=1024?(v/1024).toFixed(v%1024?1:0)+' GB':v+' MB'}
+function card(x){var u=Math.round(x.uptime||100);
+return '<div class="gpu-card glass rounded-3xl p-5 tick"><div class="flex items-start justify-between"><span class="chip">'+tier(x.gpu_model)+'</span><span class="flex items-center gap-1.5 text-xs text-gray-400"><span class="live-dot" style="width:6px;height:6px"></span>ONLINE</span></div><h3 class="text-lg font-extrabold mt-3">'+x.gpu_model+'</h3><p class="text-xs text-gray-500 mono mt-0.5">'+gb(x.vram)+' VRAM | '+x.city+' | '+x.host_id+'</p><div class="flex items-end gap-2 mt-4"><span class="text-3xl font-black neon mono">Rs '+x.display_price+'</span><span class="text-xs text-gray-500 mb-1.5">/hr</span></div><div class="mt-2 flex justify-between text-xs text-gray-500"><span>Uptime</span><span class="mono neon">'+u+'%</span></div><div class="uptime-bar mt-1"><div class="uptime-fill" style="width:'+u+'%"></div></div><button data-host="'+x.host_id+'" data-gpu="'+x.gpu_model+'" class="rentbtn btn-neon w-full mt-4 py-3 rounded-xl text-sm">Rent now</button></div>'}
+function render(){var q=$('q').value.toLowerCase(),cv=$('city').value;var l=ALL.filter(function(x){return (CHIP==='all'||x.gpu_model.toLowerCase().indexOf(CHIP.toLowerCase())>=0)&&(!q||(x.gpu_model+' '+x.city).toLowerCase().indexOf(q)>=0)&&(!cv||x.city===cv)});var s=$('sort').value;l.sort(function(a,b){return s==='price'?a.display_price-b.display_price:s==='vram'?b.vram-a.vram:(b.uptime||0)-(a.uptime||0)});var g=$('grid');if(!l.length){g.innerHTML='<div class="col-span-full glass rounded-3xl p-12 text-center"><div class="font-bold">No GPUs match</div><a href="/gpu/host.html" class="btn-neon inline-block mt-4 px-6 py-2.5 rounded-xl text-sm">Park your GPU</a></div>';return}g.innerHTML=l.map(card).join('');var btns=document.querySelectorAll('.rentbtn');for(var i=0;i<btns.length;i++){btns[i].onclick=function(){openRent(this.dataset.host,this.dataset.gpu)}}}
+function load(){fetch(API+'/gpus').then(function(r){return r.json()}).then(function(d){ALL=d;$('navCount').textContent=ALL.length+' online';$('heroCount').textContent=ALL.length+' GPUs online';$('statGpus').textContent=ALL.length;$('upd').textContent=new Date().toLocaleTimeString();var cs=[];ALL.forEach(function(x){if(cs.indexOf(x.city)<0)cs.push(x.city)});var sel=$('city'),v=sel.value;sel.innerHTML='<option value="">All cities</option>'+cs.map(function(c){return '<option>'+c+'</option>'}).join('');if(v)sel.value=v;render()}).catch(function(){$('grid').innerHTML='<div class="col-span-full glass rounded-3xl p-10 text-center text-red-400">API offline</div>'})}
+var PENDING=null;
+function openRent(id,gpu){PENDING=id;$('mGpu').textContent=gpu;$('mMeta').textContent=id;var s=localStorage.getItem('pz_email');if(s)$('mEmail').value=s;$('modal').classList.remove('hidden')}
+function closeModal(){$('modal').classList.add('hidden')}
+function confirmRent(){var em=$('mEmail').value.trim();if(!em||em.indexOf('@')<0){toast('Enter a valid email');return}localStorage.setItem('pz_email',em);closeModal();fetch(API+'/rent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({host_id:PENDING,renter_email:em,docker_image:$('mImg').value})}).then(function(r){return r.json().then(function(j){return {s:r.status,j:j}})}).then(function(o){if(o.s===402){toast('Low wallet - adding Rs 500 demo credit');fetch(API+'/wallet/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,amount:50000})}).then(function(){toast('Rs 500 added. Hit Rent again')});return}if(o.s>=400){toast(o.j.detail||'Rent failed');return}toast('Instance ready');setTimeout(function(){location.href='/gpu/dashboard.html?email='+encodeURIComponent(em)},900)}).catch(function(){toast('Network error')})}
+$('q').addEventListener('input',render);$('sort').addEventListener('change',render);$('city').addEventListener('change',render);
+var chips=document.querySelectorAll('.fchip');for(var i=0;i<chips.length;i++){chips[i].onclick=function(){CHIP=this.dataset.chip;for(var k=0;k<chips.length;k++)chips[k].classList.remove('on');this.classList.add('on');render()}}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+$('modal').addEventListener('click',function(e){if(e.target.id==='modal')closeModal()});
+load();setInterval(load,10000);
+</script></body></html>

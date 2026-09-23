@@ -1,0 +1,6 @@
+# Optional performance extras for the Ubuntu VPS only (not installable on Termux).
+# Install after requirements.txt to serve with uvloop + httptools:
+#   pip install -r requirements-prod-extras.txt
+uvloop==0.21.0
+httptools==0.6.4
+gunicorn==23.0.0

@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Host and Earn - ParkZone | Rs 5,000/month from your GPU</title><script src="https://cdn.tailwindcss.com"></script><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--neon:#00FF88;--bg:#050807}
+*{font-family:'Inter',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+body{background:var(--bg);color:#e8ece9;overflow-x:hidden}
+.bg-grid{background-image:linear-gradient(rgba(0,255,136,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.05) 1px,transparent 1px);background-size:44px 44px}
+.glow-orb{position:absolute;border-radius:9999px;filter:blur(110px);opacity:.25;pointer-events:none}
+.neon{color:var(--neon)}
+.grad-text{background:linear-gradient(92deg,#fff 20%,var(--neon) 60%,#7df9ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:rgba(255,255,255,.03);border:1px solid rgba(0,255,136,.16);backdrop-filter:blur(14px)}
+.btn-neon{background:linear-gradient(135deg,#00FF88,#00cc6e);color:#03130b;font-weight:800;box-shadow:0 0 24px rgba(0,255,136,.35);transition:.25s}
+.btn-neon:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,255,136,.55)}
+.btn-ghost{border:1px solid rgba(0,255,136,.35);color:var(--neon);transition:.25s}
+.btn-ghost:hover{background:rgba(0,255,136,.1)}
+.gpu-card{transition:.3s;position:relative;overflow:hidden}
+.gpu-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,255,136,.14)}
+.live-dot{width:8px;height:8px;border-radius:99px;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pl 1.6s infinite}
+@keyframes pl{50%{opacity:.4}}
+@keyframes fu{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.fade-up{animation:fu .7s cubic-bezier(.2,.7,.3,1) both}
+.uptime-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.uptime-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#00cc6e,var(--neon))}
+.chip{font-size:11px;padding:2px 10px;border-radius:99px;border:1px solid rgba(0,255,136,.3);color:var(--neon);background:rgba(0,255,136,.07);cursor:pointer}
+.chip.on{background:rgba(0,255,136,.2)}
+input,select{background:#0a0f0c;border:1px solid rgba(0,255,136,.25);color:#e8ece9;border-radius:10px}
+input:focus,select:focus{outline:none;border-color:var(--neon)}
+#toast{position:fixed;bottom:24px;right:24px;z-index:99;display:flex;flex-direction:column;gap:8px}
+.toast{background:#0a120d;border:1px solid rgba(0,255,136,.4);border-radius:12px;padding:12px 18px;font-size:14px;animation:fu .3s}
+.modal-bg{background:rgba(0,0,0,.75)}
+.tick{animation:fu .5s both}
+.stat-num{font-size:1.6rem;font-weight:800}
+.faq-a{display:none}
+.faq.open .faq-a{display:block}
+.faq.open .faq-q span:last-child{transform:rotate(45deg)}
+</style></head><body><div class="fixed inset-0 bg-grid pointer-events-none"></div><div class="glow-orb" style="width:560px;height:560px;background:#00FF88;top:-200px;left:50%;transform:translateX(-50%)"></div><nav class="sticky top-0 z-50 border-b border-green-900" style="background:rgba(5,8,7,.85);backdrop-filter:blur(16px)"><div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between"><a href="/gpu/" class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl grid place-items-center font-black text-black text-lg" style="background:linear-gradient(135deg,#00FF88,#00b35c)">P</div><div class="text-xl font-extrabold">PARK<span class="neon">ZONE</span><span class="text-xs text-gray-500">.in/gpu</span></div></a><div class="hidden md:flex items-center gap-7 text-sm"><a href="/gpu/" class="text-gray-300 hover:text-white transition">Marketplace</a><a href="/gpu/host.html" class="neon font-semibold">Host & Earn</a><a href="/gpu/dashboard.html" class="text-gray-300 hover:text-white transition">Dashboard</a></div><div class="flex items-center gap-3"><a href="/gpu/dashboard.html" class="btn-neon text-sm px-5 py-2 rounded-xl">Rent a GPU</a></div></div></nav>
+<header class="relative max-w-5xl mx-auto px-5 pt-16 pb-8 text-center">
+<div class="fade-up chip" style="display:inline-block">HOST PROGRAM - WEEKLY UPI PAYOUTS</div>
+<h1 class="fade-up font-black leading-tight mt-4" style="font-size:clamp(2.2rem,5vw,3.4rem);animation-delay:.08s">Earn <span class="grad-text">Rs 5,000/month</span><br>from your gaming PC</h1>
+<p class="fade-up text-gray-400 mt-4 max-w-xl mx-auto" style="animation-delay:.16s">Park your idle GPU. We fill it with AI jobs. Renter code runs inside Docker only. You get paid weekly via UPI.</p>
+<div class="fade-up mt-7 flex flex-wrap justify-center gap-3" style="animation-delay:.24s"><a href="/gpu/agent.exe" download class="btn-neon px-8 py-4 rounded-2xl text-base">Download agent for Windows</a><a href="/gpu/" class="btn-ghost px-8 py-4 rounded-2xl font-semibold">See live demand</a></div>
+<p class="text-xs text-gray-600 mt-3 mono">agent.exe - Windows 10/11 - NVIDIA GPU - Docker Desktop w/ WSL2</p></div></header>
+<main class="relative max-w-6xl mx-auto px-5 pb-20">
+<div class="grid md:grid-cols-3 gap-4">
+<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">1</div><b class="block mt-4">Download</b><p class="text-sm text-gray-400 mt-2">Get agent.exe, install Docker Desktop with WSL2 GPU support. 50 MB, no admin needed.</p></div>
+<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">2</div><b class="block mt-4">Install</b><p class="text-sm text-gray-400 mt-2">Run agent, enter email + city + hourly price. It heartbeats every 30s and appears on the marketplace.</p></div>
+<div class="glass rounded-3xl p-6"><div class="w-10 h-10 rounded-2xl grid place-items-center font-extrabold text-black" style="background:var(--neon)">3</div><b class="block mt-4">Start earning</b><p class="text-sm text-gray-400 mt-2">Renters pay per minute into your wallet. Weekly UPI payouts, Rs 500 minimum.</p></div>
+</div>
+<div class="glass rounded-3xl p-7 mt-6">
+<h2 class="font-extrabold text-xl">Earnings calculator</h2>
+<p class="text-sm text-gray-500">Move the sliders - you keep 100% of your set price</p>
+<div class="grid md:grid-cols-3 gap-5 mt-5">
+<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Your price</span><span class="mono neon font-bold" id="vP">Rs 21/hr</span></div><input id="p" type="range" min="5" max="80" value="21" class="w-full"></div>
+<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Hours / day</span><span class="mono neon font-bold" id="vH">8h</span></div><input id="h" type="range" min="1" max="24" value="8" class="w-full"></div>
+<div><div class="flex justify-between text-sm mb-2"><span class="text-gray-400">Days / month</span><span class="mono neon font-bold" id="vD">25</span></div><input id="d" type="range" min="1" max="30" value="25" class="w-full"></div>
+</div>
+<div class="flex flex-wrap items-end gap-6 mt-6"><div><div class="text-xs text-gray-500">YOU EARN</div><div id="out" class="text-4xl font-black neon mono">Rs 4,200</div></div><div class="pb-1"><div class="text-xs text-gray-500">RENTER PAYS (incl. fee)</div><div id="outR" class="text-xl font-bold mono">Rs 5,800</div></div><div class="pb-1"><div class="text-xs text-gray-500">vs AWS (~Rs 98/hr 4090)</div><div id="outS" class="text-xl font-bold mono neon">saves 70%</div></div></div>
+</div>
+<h2 class="font-extrabold text-xl mt-10 mb-4">FAQ</h2>
+<div class="space-y-3" id="faqs">
+<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">Is my PC safe?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Renter code runs inside Docker only, never directly on Windows. You can set active hours and kill any job instantly.</p></div>
+<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">When do I get paid?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Weekly UPI payouts, Rs 500 minimum. Billing is per-minute, tracked in your wallet.</p></div>
+<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">What cut does ParkZone take?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Display price = ceil(your price x 1.38). You keep 100% of your set price.</p></div>
+<div class="faq glass rounded-2xl p-5 cursor-pointer"><div class="faq-q font-bold flex justify-between">What do I need?<span class="neon">+</span></div><p class="faq-a text-sm text-gray-400 mt-2">Windows 10/11, NVIDIA GPU (6GB+ VRAM), Docker Desktop, 20+ Mbps upload.</p></div>
+</div></main>
+<footer class="border-t border-green-900 py-8 text-center text-xs text-gray-600">PARK<span class="neon">ZONE</span>.in/gpu - Vast.ai-grade power, desi prices - <a class="hover:text-gray-300" href="/gpu/host.html">Host</a> - <a class="hover:text-gray-300" href="/gpu/dashboard.html">Dashboard</a></footer><div id="toast"></div><script>
+function $(id){return document.getElementById(id)}
+function fmt(n){return n.toLocaleString('en-IN')}
+function calc(){var p=+$('p').value,h=+$('h').value,d=+$('d').value;$('vP').textContent='Rs '+p+'/hr';$('vH').textContent=h+'h';$('vD').textContent=d;$('out').textContent='Rs '+fmt(p*h*d);var r=Math.ceil(p*1.38);$('outR').textContent='Rs '+fmt(r*h*d);var s=Math.round((1-(r/98))*100);$('outS').textContent='saves '+s+'%'}
+['p','h','d'].forEach(function(i){$(i).addEventListener('input',calc)});calc();
+var fs=document.querySelectorAll('.faq');for(var i=0;i<fs.length;i++){fs[i].onclick=function(){this.classList.toggle('open')}}
+</script></body></html>
